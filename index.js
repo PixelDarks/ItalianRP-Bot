@@ -14,38 +14,6 @@ client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
 })
 
-client.on("messageCreate", (message) => {
-    if(message.content == "!assistenza") {
-        let embed = new Discord.MessageEmbed()
-            .setTitle("**Assistenza**")
-            .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket. \n Aprire un ticket e non fornire nessuna risposta in esso \n per un tempo maggiore di 24h comporterà la chiusura automatico dello stesso")
-            .setThumbnail(icon)
-            .setColor("GREEN")
-            .setFooter({
-                text: "Assistenza - IRP",
-                iconURL: icon
-            })
-            
-            let buttoncreate = new Discord.MessageButton()
-                .setLabel("Apri un ticket")
-                .setStyle("SUCCESS")
-                .setCustomId("buttoncreate")
-
-            let buttonvip = new Discord.MessageButton()
-                .setLabel("Assistenza prioritaria")
-                .setStyle("DANGER")
-                .setCustomId("buttonvip")
-            
-            let row = new Discord.MessageActionRow()
-                .addComponents(buttoncreate)
-                .addComponents(buttonvip)
-            
-            message.channel.send({ embeds: [embed], components: [row]})
-
-    }
-        
-})
-
 
 client.on("interactionCreate", interaction => {
     if(!interaction.isButton()) return
@@ -967,7 +935,7 @@ client.on("interactionCreate", async interaction => {
 
         let messages = await getAllMessages(interaction.channel)
 
-        messages.reverse.forEach(msg => {
+        messages.reverse().forEach(msg => {
             chatLog += `@${msg.author.tag} ID: ${msg.author.id} - ${msg.createdAt.toLocaleString()}\n`
 
             if(msg.content) chatLog += `${msg.content}\n`
@@ -991,8 +959,6 @@ client.on("interactionCreate", async interaction => {
 
         let attachment = new Discord.MessageAttachment(Buffer.from(chatLog, "utf-8"), `chatLog-channel-${interaction.channel.id}.txt`)
 
-        //let embed = new Discord.MessageEmbed()
-            //.setTitle()
         client.channels.cache.get("1276956932825157747").send({ files: [attachment] })
 
     }
