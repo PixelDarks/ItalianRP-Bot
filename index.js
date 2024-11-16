@@ -163,7 +163,7 @@ client.on("interactionCreate", interaction => {
 
 
 client.on("interactionCreate", interaction => {
-    if (!interaction.isSelectMenu()) return;
+    if (!interaction.isSelectMenu() || !interaction.isButton()) return;
 
     if (interaction.customId === "menuselectTicket") {
         // Risposta immediata per ogni opzione
@@ -939,6 +939,27 @@ client.on("interactionCreate", interaction => {
                 })
                 break;
         }
+    }
+})
+
+client.on("interactionCreate", interaction => {
+    var user = interaction.user;
+    var server = interaction.guild;
+
+    if (!interaction.isButton()) return;
+
+    if (interaction.customId === "deletebutton") {
+        
+    }
+
+    if (interaction.customId === "transbutton") {
+        
+        if (!interaction.member.roles.cache.has("1289639280473280624")) {
+            interaction.reply({ content: "Il bottone è riservato agli staff", ephemeral: true, components: [], embeds: []})
+            return
+        }
+
+        console.log("Staff rilevato")
     }
 })
 
