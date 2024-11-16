@@ -970,7 +970,7 @@ client.on("interactionCreate", async interaction => {
             })
             .addFields(
                 {name: `Mittente: `, value: `<@${utente.user.id}>`, inline: true},
-                {name: `Nome del ticket: `, value: "**Donazioni**", inline: false}
+                {name: `Nome del ticket: `, value: interaction.channel.name, inline: false}
             )
             .setColor("GREEN")
 
