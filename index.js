@@ -191,10 +191,22 @@ client.on("interactionCreate", interaction => {
                             .setLabel("Transcript")
                             .setStyle("SECONDARY")
                             .setCustomId("transbutton")
+
+                        let addbutton = new Discord.MessageButton()
+                            .setLabel("Transcript")
+                            .setStyle("PRIMARY")
+                            .setCustomId("addbutton")
+                        
+                        let removebutton = new Discord.MessageButton()
+                            .setLabel("Transcript")
+                            .setStyle("DANGER")
+                            .setCustomId("removebutton")
             
                         let rowsettings = new Discord.MessageActionRow()
                             .addComponents(deletebutton)
                             .addComponents(transcriptbutton)
+                            .addComponents(addbutton)
+                            .addComponents(removebutton)
                     
                     canale.send({embeds: [embed], components: [rowsettings]})
 
@@ -256,9 +268,21 @@ client.on("interactionCreate", interaction => {
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
         
+                    let addbutton = new Discord.MessageButton()
+                        .setLabel("Aggiungi membro")
+                        .setStyle("PRIMARY")
+                        .setCustomId("addbutton")
+                    
+                    let removebutton = new Discord.MessageButton()
+                        .setLabel("Rimuovi membro")
+                        .setStyle("DANGER")
+                        .setCustomId("removebutton")
+        
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
                         .addComponents(transcriptbutton)
+                        .addComponents(addbutton)
+                        .addComponents(removebutton)
                 
                 canale.send({embeds: [embed], components: [rowsettings]})
 
@@ -320,9 +344,21 @@ client.on("interactionCreate", interaction => {
                             .setStyle("SECONDARY")
                             .setCustomId("transbutton")
             
+                        let addbutton = new Discord.MessageButton()
+                            .setLabel("Aggiungi membro")
+                            .setStyle("PRIMARY")
+                            .setCustomId("addbutton")
+                        
+                        let removebutton = new Discord.MessageButton()
+                            .setLabel("Rimuovi membro")
+                            .setStyle("DANGER")
+                            .setCustomId("removebutton")
+            
                         let rowsettings = new Discord.MessageActionRow()
                             .addComponents(deletebutton)
                             .addComponents(transcriptbutton)
+                            .addComponents(addbutton)
+                            .addComponents(removebutton)
                     
                     canale.send({embeds: [embed], components: [rowsettings]})
 
@@ -383,9 +419,21 @@ client.on("interactionCreate", interaction => {
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
         
+                    let addbutton = new Discord.MessageButton()
+                        .setLabel("Aggiungi membro")
+                        .setStyle("PRIMARY")
+                        .setCustomId("addbutton")
+                    
+                    let removebutton = new Discord.MessageButton()
+                        .setLabel("Rimuovi membro")
+                        .setStyle("DANGER")
+                        .setCustomId("removebutton")
+        
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
                         .addComponents(transcriptbutton)
+                        .addComponents(addbutton)
+                        .addComponents(removebutton)
                 
                 canale.send({embeds: [embed], components: [rowsettings]})
 
@@ -446,9 +494,21 @@ client.on("interactionCreate", interaction => {
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
         
+                    let addbutton = new Discord.MessageButton()
+                        .setLabel("Aggiungi membro")
+                        .setStyle("PRIMARY")
+                        .setCustomId("addbutton")
+                    
+                    let removebutton = new Discord.MessageButton()
+                        .setLabel("Rimuovi membro")
+                        .setStyle("DANGER")
+                        .setCustomId("removebutton")
+        
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
                         .addComponents(transcriptbutton)
+                        .addComponents(addbutton)
+                        .addComponents(removebutton)
                 
                 canale.send({embeds: [embed], components: [rowsettings]})
 
