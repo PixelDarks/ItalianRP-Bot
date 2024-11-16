@@ -278,7 +278,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Tipo di ticket: `, value: "**Un-ban**", inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -328,7 +342,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Tipo di ticket: `, value: "**Problemi di accesso**", inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                        let deletebutton = new Discord.MessageButton()
+                            .setLabel("Elimina")
+                            .setStyle("DANGER")
+                            .setCustomId("deletebutton")
+
+                        let transcriptbutton = new Discord.MessageButton()
+                            .setLabel("Transcript")
+                            .setStyle("SECONDARY")
+                            .setCustomId("transbutton")
+            
+                        let rowsettings = new Discord.MessageActionRow()
+                            .addComponents(deletebutton)
+                            .addComponents(transcriptbutton)
+                    
+                    canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -377,7 +405,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Tipo di ticket: `, value: "**Discord Fazioni**", inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -426,7 +468,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Tipo di ticket: `, value: "**Donazioni**", inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -475,8 +531,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Tipo di ticket: `, value: "**Amministrazione**", inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
 
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
                 })
                 break;
         }
@@ -531,7 +600,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Generale**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -581,7 +664,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Un-ban**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -631,7 +728,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Problemi di accesso**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -681,7 +792,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Discord Fazioni**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -731,7 +856,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Donazioni**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
@@ -781,7 +920,21 @@ client.on("interactionCreate", interaction => {
                             {name: `Tipo di ticket: `, value: "**Amministrazione**", inline: false},
                             {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                    canale.send({embeds: [embed]})
+                    let deletebutton = new Discord.MessageButton()
+                        .setLabel("Elimina")
+                        .setStyle("DANGER")
+                        .setCustomId("deletebutton")
+
+                    let transcriptbutton = new Discord.MessageButton()
+                        .setLabel("Transcript")
+                        .setStyle("SECONDARY")
+                        .setCustomId("transbutton")
+        
+                    let rowsettings = new Discord.MessageActionRow()
+                        .addComponents(deletebutton)
+                        .addComponents(transcriptbutton)
+                
+                canale.send({embeds: [embed], components: [rowsettings]})
 
                 })
                 break;
