@@ -958,8 +958,24 @@ client.on("interactionCreate", async interaction => {
         })
 
         let attachment = new Discord.MessageAttachment(Buffer.from(chatLog, "utf-8"), `chatLog-channel-${interaction.channel.id}.txt`)
+    
+        let guild = interaction.guild;
 
-        client.channels.cache.get("1276956932825157747").send({ files: [attachment] })
+        let utente = guild.members.cache.find(m => m.user.username === interaction.channel.name)
+
+        let embed = new Discord.MessageEmbed()
+            .setAuthor({
+                name: interaction.channel.name,
+                iconURL: utente.user.avatarURL()
+            })
+            .addFields(
+                {name: `Mittente: `, value: `<@${utente.user.id}>`, inline: true},
+                {name: `Nome del ticket: `, value: "**Donazioni**", inline: false}
+            )
+            .setColor("GREEN")
+
+
+        client.channels.cache.get("1276956932825157747").send({ embeds: [embed], files: [attachment] })
 
     }
 })
