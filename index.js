@@ -163,7 +163,7 @@ client.on("interactionCreate", interaction => {
 
 
 client.on("interactionCreate", interaction => {
-    if (!interaction.isSelectMenu() || !interaction.isButton()) return;
+    if (!interaction.isSelectMenu()) return;
 
     if (interaction.customId === "menuselectTicket") {
         // Risposta immediata per ogni opzione
@@ -958,6 +958,8 @@ client.on("interactionCreate", interaction => {
             interaction.reply({ content: "Il bottone è riservato agli staff", ephemeral: true, components: [], embeds: []})
             return
         }
+
+        interaction.deferUpdate()
 
         console.log("Staff rilevato")
     }
