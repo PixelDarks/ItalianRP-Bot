@@ -942,14 +942,16 @@ client.on("interactionCreate", interaction => {
     }
 })
 
-client.on("interactionCreate", interaction => {
+client.on("interactionCreate", async interaction => {
     var user = interaction.user;
     var server = interaction.guild;
 
     if (!interaction.isButton()) return;
 
     if (interaction.customId === "deletebutton") {
-        
+        interaction.deferUpdate()
+
+        interaction.channel.delete()
     }
 
     if (interaction.customId === "transbutton") {
@@ -961,9 +963,62 @@ client.on("interactionCreate", interaction => {
 
         interaction.deferUpdate()
 
-        console.log("Staff rilevato")
+        let chatLog = `-- CHAT LOG #${interaction.channel.name} --\n\n`
+
+        let messages = await getAllMessages(interaction.channel)
+
+        messages.reverse.forEach(msg => {
+            chatLog += `@${msg.author.tag} ID: ${msg.author.id} - ${msg.createdAt.toLocaleString()}\n`
+
+            if(msg.content) chatLog += `${msg.content}\n`
+
+            if(msg.embeds[0]) {
+                chatLog += `Embed:\n`
+
+                if(msg.embeds[0].title) chatLog += `Title: ${msg.embeds[0].title}\n`
+                if(msg.embeds[0].description) chatLog += `Description: ${msg.embeds[0].description}\n`
+                if(msg.embeds[0].fields[0]) chatLog += `Fields: ${msg.embeds[0].fields.map(x => `${x.value}`).join(", ")}\n`
+            }
+
+            if (msg.attachments.size > 0)
+                chatLog += `Files: ${msg.attachments.map(x => `${x.name} (${x.url})`).join(", ")}\n`
+
+            if (msg.stickers.size > 0)
+                chatLog += `Stickers: ${msg.stickers.map(x => `${x.name} (${x.url})`).join(", ")}\n`
+
+            chatLog += "\n"
+        })
+
+        let attachment = new Discord.MessageAttachment(Buffer.from(chatLog, "utf-8"), `chatLog-channel-${interaction.channel.id}.txt`)
+
+        //let embed = new Discord.MessageEmbed()
+            //.setTitle()
+        client.channels.cache.get("1276956932825157747").send({ files: [attachment] })
+
     }
 })
+
+const getAllMessages = async (channel) => {
+    let allMessages = []
+    let lastMessage
+
+    while(true) {
+        const options = {limit: 100}
+        if(lastMessage) options.before = lastMessage
+
+        let messages = await channel.messages.fetch(options)
+
+        allMessages = allMessages.concat(Array.from(messages.values()))
+
+        lastMessage = messages.last().id
+
+        if(messages.size != 100) {
+            break
+        }
+    }
+
+    return allMessages
+}
 
 
 
