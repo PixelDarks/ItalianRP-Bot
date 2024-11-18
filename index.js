@@ -14,7 +14,7 @@ client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
 })
 
-client.on("messageCreate", message => {
+/*client.on("messageCreate", message => {
     if (message.content == "!ticketsassistenza") {
         let embedhelp = new Discord.MessageEmbed()
             .setTitle("Assistenza")
@@ -44,6 +44,7 @@ client.on("messageCreate", message => {
         message.channel.send({ embeds: [embedhelp], components: [rowhelp]})
     }
 })
+*/
 
 client.on("interactionCreate", interaction => {
     if(!interaction.isButton()) return
@@ -216,11 +217,13 @@ client.on("interactionCreate", interaction => {
                             .setLabel("Elimina")
                             .setStyle("DANGER")
                             .setCustomId("deletebutton")
+                            .setEmoji('🔒')
 
                         let transcriptbutton = new Discord.MessageButton()
                             .setLabel("Transcript")
                             .setStyle("SECONDARY")
                             .setCustomId("transbutton")
+                            .setEmoji('📜')
 
                         
             
@@ -283,11 +286,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     
         
@@ -350,11 +355,13 @@ client.on("interactionCreate", interaction => {
                             .setLabel("Elimina")
                             .setStyle("DANGER")
                             .setCustomId("deletebutton")
+                            .setEmoji('🔒')
 
                         let transcriptbutton = new Discord.MessageButton()
                             .setLabel("Transcript")
                             .setStyle("SECONDARY")
                             .setCustomId("transbutton")
+                            .setEmoji('📜')
         
             
                         let rowsettings = new Discord.MessageActionRow()
@@ -415,11 +422,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
@@ -478,11 +487,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
         
                     let rowsettings = new Discord.MessageActionRow()
@@ -543,11 +554,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
         
                     let rowsettings = new Discord.MessageActionRow()
@@ -614,11 +627,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
@@ -679,11 +694,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     
         
@@ -746,11 +763,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     
         
@@ -812,11 +831,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     
         
@@ -879,11 +900,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     
         
@@ -946,11 +969,13 @@ client.on("interactionCreate", interaction => {
                         .setLabel("Elimina")
                         .setStyle("DANGER")
                         .setCustomId("deletebutton")
+                        .setEmoji('🔒')
 
                     let transcriptbutton = new Discord.MessageButton()
                         .setLabel("Transcript")
                         .setStyle("SECONDARY")
                         .setCustomId("transbutton")
+                        .setEmoji('📜')
         
                     let rowsettings = new Discord.MessageActionRow()
                         .addComponents(deletebutton)
