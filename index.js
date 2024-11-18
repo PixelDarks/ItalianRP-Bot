@@ -1,7 +1,19 @@
 const Discord = require("discord.js")
 
 const client = new Discord.Client(
-    {intents:["GUILDS", "GUILD_MEMBERS", "GUILD_MESSAGES"]}
+    {intents:[
+        Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildMembers,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.MessageContent,   
+        Discord.GatewayIntentBits.GuildEmojisAndStickers,
+        Discord.GatewayIntentBits.GuildIntegrations,
+        Discord.GatewayIntentBits.GuildWebhooks,
+        Discord.GatewayIntentBits.GuildInvites,
+        Discord.GatewayIntentBits.GuildVoiceStates,
+        Discord.GatewayIntentBits.GuildPresences,
+        Discord.GatewayIntentBits.GuildMessages,
+        Discord.GatewayIntentBits.DirectMessages]}
 )
 
 const { icon } = require("./token.json")
@@ -15,195 +27,108 @@ client.on("ready", () => {
 })
 
 /*client.on("messageCreate", message => {
-    if (message.content == "!ticketsassistenza") {
-        let embedhelp = new Discord.MessageEmbed()
+    if (message.content == "!ticketsassistenzanuovo1") {
+        let embedhelp = new Discord.EmbedBuilder()
             .setTitle("Assistenza")
             .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
             .setThumbnail(icon)
-            .setColor("GREEN")
+            .setColor("Green")
             .setFooter({
                 text: "Assistenza - IRP",
                 iconURL: icon
             })
-        let buttonshelp = new Discord.MessageButton()
+        let buttonshelp = new Discord.ButtonBuilder()
             .setCustomId("buttoncreate")
             .setLabel("Apri un ticket")
-            .setStyle("SUCCESS")
+            .setStyle("Success")
             .setEmoji('📩')
 
-        let buttonshelpvip = new Discord.MessageButton()
-            .setCustomId("buttonvip")
-            .setLabel("Assistenza Prioritaria")
-            .setStyle("PRIMARY")
-            .setEmoji('💎')
-        
-        let rowhelp = new Discord.MessageActionRow()
+        //let buttonshelpvip = new Discord.MessageButton()
+            //.setCustomId("buttonvip")
+            //.setLabel("Assistenza Prioritaria")
+           // .setStyle("PRIMARY")
+            //.setEmoji('💎')
+
+        let rowhelp = new Discord.ActionRowBuilder()
             .addComponents(buttonshelp)
-            .addComponents(buttonshelpvip)
 
         message.channel.send({ embeds: [embedhelp], components: [rowhelp]})
     }
-})
-*/
+})*/
 
-client.on("interactionCreate", interaction => {
+
+client.on("interactionCreate", async interaction => {
     if(!interaction.isButton()) return
     
     if(interaction.customId == "buttoncreate") {
-        var embedmenu = new Discord.MessageEmbed()
-            .setTitle("Tipologie di ticket")
-            .setFooter({
-            text: "Assistenza - IRP",
-            iconURL: icon
-            })
+        let modal = new Discord.ModalBuilder()
+            .setCustomId("modalTicket")
+            .setTitle("Apri un ticket")
 
-        var selectmenu = new Discord.MessageSelectMenu()
-            .setCustomId("menuselectTicket")
-            .setPlaceholder("Seleziona una tipologia")
-            .setMinValues(1)
-            .setMaxValues(1)
-            .addOptions([
-                {
-                    label: "Generale",
-                    value: "generale"
-                },
-                {
-                    label: "Un-ban",
-                    description: "Richiesta di un-ban",
-                    value: "unban"
-                },
-                {
-                    label: "Problemi di accesso",
-                    description: "Problemi di accesso alla mappa RP",
-                    value: "access-difficulty"
-                },
-                {
-                    label: "Discord Fazioni",
-                    description: "Richiedi il server per il proprio lavoro",
-                    value: "discord-work"
-                },
-                {
-                    label: "Donazioni",
-                    description: "Donazioni al server",
-                    value: "donations"
-                },
-                {
-                    label: "Amministrazione",
-                    description: "Parla in privato con l'Owner o il Co-Owner",
-                    value: "admin"
-                }
-            ])
+        let problemInput = new Discord.TextInputBuilder()
+            .setCustomId("problem_input")
+            .setLabel("Descrivi il tuo problema")
+            .setStyle(Discord.TextInputStyle.Paragraph)
+            .setMinLength(1)
+            .setMaxLength(150)
+            .setPlaceholder("Scrivi qui il tuo problema...")
+            .setRequired(true)
+        
 
-        let rowmenu = new Discord.MessageActionRow()
-            .addComponents(selectmenu)
+        let rowmodal = new Discord.ActionRowBuilder()
+            .addComponents(problemInput)
+        
+        modal.addComponents(rowmodal)
 
-        interaction.reply({embeds: [embedmenu], components: [rowmenu], ephemeral: true})
-
+        await interaction.showModal(modal)
         
     }
 
-    if(interaction.customId == "buttonvip") {
-        if(interaction.member.roles.cache.has("1297128036197470251")) {
-            var embedmenuvip = new Discord.MessageEmbed()
-            .setTitle("Tipologie di ticket")
-            .setFooter({
-                text: "Assistenza - IRP",
-                iconURL: icon
-            })
-
-            var selectmenuvip = new Discord.MessageSelectMenu()
-                .setCustomId("menuselectTicketVip")
-                .setPlaceholder("Seleziona una tipologia")
-                .setMinValues(1)
-                .setMaxValues(1)
-                .addOptions([
-                    {
-                        label: "Generale",
-                        value: "generale"
-                    },
-                    {
-                        label: "Un-ban",
-                        description: "Richiesta di un-ban",
-                        value: "unban"
-                    },
-                    {
-                        label: "Problemi di accesso",
-                        description: "Problemi di accesso alla mappa RP",
-                        value: "access-difficulty"
-                    },
-                    {
-                        label: "Discord Fazioni",
-                        description: "Richiedi il server per il proprio lavoro",
-                        value: "discord-work"
-                    },
-                    {
-                        label: "Donazioni",
-                        description: "Donazioni al server",
-                        value: "donations"
-                    },
-                    {
-                        label: "Amministrazione",
-                        description: "Parla in privato con l'Owner o il Co-Owner",
-                        value: "admin"
-                    }
-                ])
-
-            let rowmenuvip = new Discord.MessageActionRow()
-                .addComponents(selectmenuvip)
-                interaction.reply({embeds: [embedmenuvip], components: [rowmenuvip], ephemeral: true})
-        } else {
-            interaction.reply({content: "Non sei un vip!", ephemeral: true})
-        }
-        
-
-    
-    }
 })
 
 
 client.on("interactionCreate", interaction => {
-    if (!interaction.isSelectMenu()) return;
+    if (interaction.isModalSubmit()) {
+        if(interaction.customId === "modalTicket") {
 
-    if (interaction.customId === "menuselectTicket") {
-        // Risposta immediata per ogni opzione
-        switch (interaction.values[0]) {
-            //GENERALE
-            case "generale":
-                interaction.deleteReply()
+            
+            
+            const userInput = interaction.fields.getTextInputValue("problem_input")
+            
+            var user = interaction.user;
+            var server = interaction.guild;
 
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
+            if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
                 interaction.deferUpdate()
+                return
+            }
 
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
+            interaction.deferUpdate()
+
+            server.channels.create({
+                name: user.username,
+                type: Discord.ChannelType.GuildText,
+                permissionOverwrites: [
+                    {
+                        id:server.id,
+                        deny: ["ViewChannel"]
+                    },
+                    {
+                        id:user.id,
+                        allow: ["ViewChannel"]
+                    },
+                    {
+                        id: "1289639280473280624",
+                        allow: ["ViewChannel"]
+                    }
+                ]
+            }).then(canale => {
+                canale.setTopic(`User ID: ${user.id}`)
+                if (interaction.member.roles.cache.has("1297128036197470251")) {
+                    let embed = new Discord.EmbedBuilder()
                         .setTitle("**Assistenza**")
                         .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
+                        .setColor("Green")
                         .setThumbnail(user.avatarURL())
                         .setFooter({
                             text: "Assistenza - IRP",
@@ -211,68 +136,36 @@ client.on("interactionCreate", interaction => {
                         })
                         .addFields(
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Generale**", inline: false}
+                            {name: `Descrizione Problema: `, value: userInput, inline: false},
+                            {name: `Con Vip: `, value: `<@&1289639280473280624>`, inline: false}
                         )
-                        let deletebutton = new Discord.MessageButton()
+                        let deletebutton = new Discord.ButtonBuilder()
                             .setLabel("Elimina")
-                            .setStyle("DANGER")
+                            .setStyle("Danger")
                             .setCustomId("deletebutton")
                             .setEmoji('🔒')
-
-                        let transcriptbutton = new Discord.MessageButton()
+    
+                        let transcriptbutton = new Discord.ButtonBuilder()
                             .setLabel("Transcript")
-                            .setStyle("SECONDARY")
+                            .setStyle("Secondary")
                             .setCustomId("transbutton")
                             .setEmoji('📜')
-
+    
                         
             
-                        let rowsettings = new Discord.MessageActionRow()
+                        let rowsettings = new Discord.ActionRowBuilder()
                             .addComponents(deletebutton)
                             .addComponents(transcriptbutton)
                             
                     
                     canale.send({embeds: [embed], components: [rowsettings]})
 
-                })
-                break;
-            //UNBAN
-            case "unban":
-                interaction.deleteReply()
+                } else {
 
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
+                    let embed = new Discord.EmbedBuilder()
                         .setTitle("**Assistenza**")
                         .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
+                        .setColor("Green")
                         .setThumbnail(user.avatarURL())
                         .setFooter({
                             text: "Assistenza - IRP",
@@ -280,714 +173,37 @@ client.on("interactionCreate", interaction => {
                         })
                         .addFields(
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Un-ban**", inline: false}
+                            {name: `Descrizione Problema: `, value: userInput, inline: false}
                         )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                       
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            //DIFFICOLTà di accesso
-            case "access-difficulty":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Problemi di accesso**", inline: false}
-                        )
-                        let deletebutton = new Discord.MessageButton()
+                        let deletebutton = new Discord.ButtonBuilder()
                             .setLabel("Elimina")
-                            .setStyle("DANGER")
+                            .setStyle("Danger")
                             .setCustomId("deletebutton")
                             .setEmoji('🔒')
-
-                        let transcriptbutton = new Discord.MessageButton()
+    
+                        let transcriptbutton = new Discord.ButtonBuilder()
                             .setLabel("Transcript")
-                            .setStyle("SECONDARY")
+                            .setStyle("Secondary")
                             .setCustomId("transbutton")
                             .setEmoji('📜')
-        
+    
+                        
             
-                        let rowsettings = new Discord.MessageActionRow()
+                        let rowsettings = new Discord.ActionRowBuilder()
                             .addComponents(deletebutton)
                             .addComponents(transcriptbutton)
-        
+                            
                     
                     canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "discord-work":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
                 }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Discord Fazioni**", inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                     
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "donations":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Donazioni**", inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                        
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "admin":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Amministrazione**", inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                    
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-                })
-                break;
+            })
         }
     }
 
-    if (interaction.customId === "menuselectTicketVip") {
-        // Stessa logica applicata al menu VIP
-        switch (interaction.values[0]) {
-            case "generale":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Generale**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
+    
         
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                        
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "unban":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Un-ban**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                        
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "access-difficulty":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Problemi di accesso**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                       
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "discord-work":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Discord Fazioni**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                       
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "donations":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Donazioni**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                    
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-            case "admin":
-                interaction.deleteReply()
-
-                
-                var user = interaction.user;
-                var server = interaction.guild;
-
-                if(server.channels.cache.find(canale => canale.topic == `User ID: ${user.id}`)) {
-                    interaction.update({ content: "Hai già un ticket aperto!", ephemeral: true, components: [], embeds:[] })
-                    return
-                }
-
-                interaction.deferUpdate()
-
-                server.channels.create(user.username, {
-                    type: "text",
-                    permissionOverwrites: [
-                        {
-                            id:server.id,
-                            deny: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:user.id,
-                            allow: ["VIEW_CHANNEL"]
-                        },
-                        {
-                            id:"1289639280473280624",
-                            allow: ["VIEW_CHANNEL"]
-                        }
-                    ]
-                }).then(canale => {
-                    canale.setTopic(`User ID: ${user.id}`)
-                    let embed = new Discord.MessageEmbed()
-                        .setTitle("**Assistenza**")
-                        .setDescription("Nuovo ticket creato!")
-                        .setColor("GREEN")
-                        .setThumbnail(user.avatarURL())
-                        .setFooter({
-                            text: "Assistenza - IRP",
-                            iconURL: icon
-                        })
-                        .addFields(
-                            {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Tipo di ticket: `, value: "**Amministrazione**", inline: false},
-                            {name: `Con VIP: `, value: `<@&1289639280473280624>`, inline: false}
-                        )
-                    let deletebutton = new Discord.MessageButton()
-                        .setLabel("Elimina")
-                        .setStyle("DANGER")
-                        .setCustomId("deletebutton")
-                        .setEmoji('🔒')
-
-                    let transcriptbutton = new Discord.MessageButton()
-                        .setLabel("Transcript")
-                        .setStyle("SECONDARY")
-                        .setCustomId("transbutton")
-                        .setEmoji('📜')
-        
-                    let rowsettings = new Discord.MessageActionRow()
-                        .addComponents(deletebutton)
-                        .addComponents(transcriptbutton)
-                
-                canale.send({embeds: [embed], components: [rowsettings]})
-
-                })
-                break;
-        }
     }
-})
+)
 
 client.on("interactionCreate", async interaction => {
     var user = interaction.user;
@@ -1038,13 +254,13 @@ client.on("interactionCreate", async interaction => {
             chatLog += "\n"
         })
 
-        let attachment = new Discord.MessageAttachment(Buffer.from(chatLog, "utf-8"), `chatLog-channel-${interaction.channel.id}.txt`)
+        let attachment = new Discord.AttachmentBuilder(Buffer.from(chatLog, "utf-8"), { name:`chatLog-channel-${interaction.channel.id}.txt`, contentType: "text/plain"})
     
         let guild = interaction.guild;
 
         let utente = guild.members.cache.find(m => m.user.username === interaction.channel.name)
 
-        let embed = new Discord.MessageEmbed()
+        let embed = new Discord.EmbedBuilder()
             .setAuthor({
                 name: interaction.channel.name,
                 iconURL: utente.user.avatarURL()
@@ -1053,7 +269,7 @@ client.on("interactionCreate", async interaction => {
                 {name: `Mittente: `, value: `<@${utente.user.id}>`, inline: true},
                 {name: `Nome del ticket: `, value: interaction.channel.name, inline: false}
             )
-            .setColor("GREEN")
+            .setColor("Green")
 
 
         client.channels.cache.get("1276956932825157747").send({ embeds: [embed], files: [attachment] })
@@ -1099,16 +315,35 @@ client.on("messageCreate", message => {
                     return
                 }
 
-                const haspermissionobtained = message.channel.permissionsFor(utente)?.has("VIEW_CHANNEL");
+                const haspermissionobtained = message.channel.permissionsFor(utente.user)?.has("ViewChannel");
 
                 if (haspermissionobtained) {
                     message.reply("Questo utente ha già accesso al ticket")
                     return
                 }
 
-                message.channel.permissionOverwrites.edit(utente, {
-                    VIEW_CHANNEL: true
-                })
+                let server = message.guild
+
+                let ownerticket = server.members.cache.find(m => m.user.username === message.channel.name)
+
+                message.channel.permissionOverwrites.set([
+                    {
+                        id: utente.user.id,
+                        allow: ["ViewChannel"]
+                    },
+                    {
+                        id: ownerticket.user.id,
+                        allow: ["ViewChannel"]
+                    },
+                    {
+                        id: server.id,
+                        deny: ["ViewChannel"]
+                    },
+                    {
+                        id: "1289639280473280624",
+                        allow: ["ViewChannel"]
+                    }
+                ])
 
                 message.channel.send(`${utente.toString()} è stato aggiunto al ticket`)
             } else {
@@ -1135,16 +370,35 @@ client.on("messageCreate", message => {
                     return
                 }
 
-                const haspermissionobtained = message.channel.permissionsFor(utente)?.has("VIEW_CHANNEL");
+                const haspermissionobtained = message.channel.permissionsFor(utente.user)?.has("ViewChannel");
 
                 if (!haspermissionobtained) {
                     message.reply("Questo utente non ha ancora l'accesso al ticket")
                     return
                 }
 
-                message.channel.permissionOverwrites.edit(utente, {
-                    VIEW_CHANNEL: false
-                })
+                let server = message.guild
+
+                let ownerticket = server.members.cache.find(m => m.user.username === message.channel.name)
+
+                message.channel.permissionOverwrites.set([
+                    {
+                        id: utente.user.id,
+                        deny: ["ViewChannel"]
+                    },
+                    {
+                        id: ownerticket.user.id,
+                        allow: ["ViewChannel"]
+                    },
+                    {
+                        id: server.id,
+                        deny: ["ViewChannel"]
+                    },
+                    {
+                        id: "1289639280473280624",
+                        allow: ["ViewChannel"]
+                    }
+                ])
 
                 message.channel.send(`${utente.toString()} è stato rimosso dal ticket`)
             } else {
