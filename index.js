@@ -14,6 +14,36 @@ client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
 })
 
+client.on("messageCreate", message => {
+    if (message.content == "!ticketsassistenza") {
+        let embedhelp = new Discord.MessageEmbed()
+            .setTitle("Assistenza")
+            .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
+            .setThumbnail(icon)
+            .setColor("GREEN")
+            .setFooter({
+                text: "Assistenza - IRP",
+                iconURL: icon
+            })
+        let buttonshelp = new Discord.MessageButton()
+            .setCustomId("buttoncreate")
+            .setLabel("Apri un ticket")
+            .setStyle("SUCCESS")
+            .setEmoji('📩')
+
+        let buttonshelpvip = new Discord.MessageButton()
+            .setCustomId("buttonvip")
+            .setLabel("Assistenza Prioritaria")
+            .setStyle("PRIMARY")
+            .setEmoji('💎')
+        
+        let rowhelp = new Discord.MessageActionRow()
+            .addComponents(buttonshelp)
+            .addComponents(buttonshelpvip)
+
+        message.channel.send({ embeds: [embedhelp], components: [rowhelp]})
+    }
+})
 
 client.on("interactionCreate", interaction => {
     if(!interaction.isButton()) return
