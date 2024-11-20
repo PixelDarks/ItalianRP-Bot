@@ -16,11 +16,11 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.DirectMessages]}
 )
 
+require('dotenv').config();
+
 const { icon } = require("./token.json")
 
-const { token } = require("./token.json")
-
-client.login(token);
+client.login(process.env.TOKEN);
 
 client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
