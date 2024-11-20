@@ -18,7 +18,7 @@ const client = new Discord.Client(
 
 require('dotenv').config();
 
-const { icon } = require("./token.json")
+const { icon } = require("./fileresources.json")
 
 client.login(process.env.TOKEN);
 
