@@ -18,6 +18,7 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.DirectMessages]}
 )
 
+
 require('dotenv').config();
 
 const { icon } = require("./fileresources.json")
@@ -57,7 +58,9 @@ client.on("ready", () => {
                 }
             ]
         })
-    
+
+        
+        
         guild.commands.create({
             name: "temprole-remove",
             description: "Rimuove un ruolo specifico ad un utente",
@@ -77,9 +80,40 @@ client.on("ready", () => {
             ]
         })
 
+        guild.commands.create({
+            name: "add",
+            description: "Aggiunge un utente al ticket",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+
+        guild.commands.create({
+            name: "remove",
+            description: "Rimuove un utente dal ticket",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
         
-    
+        
+        
     })
+    
+    
+    
+    
+    
 
         
 })
@@ -267,12 +301,6 @@ client.on("interactionCreate", interaction => {
     }
     
 })
-
-
-
-
-
-
 
 
 client.on("interactionCreate", interaction => {
@@ -487,34 +515,36 @@ const getAllMessages = async (channel) => {
     return allMessages
 }
 
-client.on("messageCreate", message => {
-    if(message.content.startsWith("!add")) {
-        var topic = message.channel.topic;
+client.on("interactionCreate", interaction => {
+    if (!interaction.isCommand()) return
+
+    if(interaction.commandName == "add") {
+        var topic = interaction.channel.topic;
         if (!topic) {
-            message.reply({ content: "Non puoi utilizzare questo comando qui", ephemeral: true});
+            interaction.reply({ content: "Non puoi utilizzare questo comando qui", ephemeral: true});
             return
         }
 
         if (topic.startsWith("User ID:")) {
-            if (message.member.roles.cache.has("1289639280473280624")) {
-                var utente = message.mentions.members.first();
+            if (interaction.member.roles.cache.has("1289639280473280624")) {
+                var utente = interaction.options.getMember("membro")
                 if (!utente) {
-                    message.reply({ content: "Inserire un utente valido", ephemeral: true})
+                    interaction.reply({ content: "Inserire un utente valido", ephemeral: true})
                     return
                 }
 
-                const haspermissionobtained = message.channel.permissionsFor(utente.user)?.has("ViewChannel");
+                const haspermissionobtained = interaction.channel.permissionsFor(utente.user)?.has("ViewChannel");
 
                 if (haspermissionobtained) {
-                    message.reply("Questo utente ha già accesso al ticket")
+                    interaction.reply({content: "Questo utente ha già accesso al ticket", ephemeral: true})
                     return
                 }
 
-                let server = message.guild
+                let server = interaction.guild
 
-                let ownerticket = server.members.cache.find(m => m.user.username === message.channel.name)
+                let ownerticket = server.members.cache.find(m => m.user.username === interaction.channel.name)
 
-                message.channel.permissionOverwrites.set([
+                interaction.channel.permissionOverwrites.set([
                     {
                         id: utente.user.id,
                         allow: ["ViewChannel"]
@@ -533,43 +563,45 @@ client.on("messageCreate", message => {
                     }
                 ])
 
-                message.channel.send(`${utente.toString()} è stato aggiunto al ticket`)
+                interaction.reply({ content:`${utente.toString()} è stato aggiunto al ticket`})
             } else {
-                message.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
+                interaction.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
                 return
             }
         }
     }
 })
 
-client.on("messageCreate", message => {
-    if(message.content.startsWith("!remove")) {
-        var topic = message.channel.topic;
+client.on("interactionCreate", interaction => {
+    if (!interaction.isCommand()) return
+
+    if(interaction.commandName == "remove") {
+        var topic = interaction.channel.topic;
         if (!topic) {
-            message.reply({ content: "Non puoi utilizzare questo comando qui", ephemeral: true});
+            interaction.reply({ content: "Non puoi utilizzare questo comando qui", ephemeral: true});
             return
         }
 
         if (topic.startsWith("User ID:")) {
-            if (message.member.roles.cache.has("1289639280473280624")) {
-                var utente = message.mentions.members.first();
+            if (interaction.member.roles.cache.has("1289639280473280624")) {
+                var utente = interaction.options.getMember("membro")
                 if (!utente) {
-                    message.reply({ content: "Inserire un utente valido", ephemeral: true})
+                    interaction.reply({ content: "Inserire un utente valido", ephemeral: true})
                     return
                 }
 
-                const haspermissionobtained = message.channel.permissionsFor(utente.user)?.has("ViewChannel");
+                const haspermissionobtained = interaction.channel.permissionsFor(utente.user)?.has("ViewChannel");
 
                 if (!haspermissionobtained) {
-                    message.reply("Questo utente non ha ancora l'accesso al ticket")
+                    interaction.reply("Questo utente non ha ancora l'accesso al ticket")
                     return
                 }
 
-                let server = message.guild
+                let server = interaction.guild
 
-                let ownerticket = server.members.cache.find(m => m.user.username === message.channel.name)
+                let ownerticket = server.members.cache.find(m => m.user.username === interaction.channel.name)
 
-                message.channel.permissionOverwrites.set([
+                interaction.channel.permissionOverwrites.set([
                     {
                         id: utente.user.id,
                         deny: ["ViewChannel"]
@@ -588,9 +620,9 @@ client.on("messageCreate", message => {
                     }
                 ])
 
-                message.channel.send(`${utente.toString()} è stato rimosso dal ticket`)
+                interaction.reply({ content:`${utente.toString()} è stato rimosso dal ticket`})
             } else {
-                message.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
+                interaction.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
                 return
             }
         }
