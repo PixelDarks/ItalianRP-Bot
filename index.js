@@ -1,4 +1,6 @@
 const Discord = require("discord.js")
+const fs = require('fs')
+const path = './temproles.json'
 
 const client = new Discord.Client(
     {intents:[
@@ -24,6 +26,62 @@ client.login(process.env.TOKEN);
 
 client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
+    client.guilds.cache.forEach(guild => {
+        guild.commands.create({
+            name: "temprole-add",
+            description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "ruolo",
+                    description: "Seleziona il ruolo",
+                    type: Discord.ApplicationCommandOptionType.Role,
+                    required: true
+                },
+                {
+                    name: "durata",
+                    description: "Scrivi la durata (sarà in giorni)",
+                    type: Discord.ApplicationCommandOptionType.Number,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
+    
+        guild.commands.create({
+            name: "temprole-remove",
+            description: "Rimuove un ruolo specifico ad un utente",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "ruolo",
+                    description: "Seleziona il ruolo",
+                    type: Discord.ApplicationCommandOptionType.Role,
+                    required: true
+                }
+            ]
+        })
+
+        
+    
+    })
+
+        
 })
 
 /*client.on("messageCreate", message => {
@@ -56,6 +114,31 @@ client.on("ready", () => {
     }
 })*/
 
+setInterval(() => {
+    const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
+    const now = Date.now();
+
+    // Filtra i ruoli scaduti
+    const updatedRoles = temprolesData.userRoles.filter(async entry => {
+        if (entry.expiresAt <= now) {
+            try {
+                const guild = client.guilds.cache.get(entry.guildId);
+                const member = guild.members.cache.get(entry.userId);
+                const role = guild.roles.cache.get(entry.roleId);
+
+                if (member && role) {
+                    await member.roles.remove(role);
+                }
+            } catch (error) {
+                console.error(`Errore nella rimozione del ruolo: ${error.message}`);
+            }
+            return false; // Rimuovi dal file
+        }
+        return true; // Mantieni
+    });
+
+    fs.writeFileSync(path, JSON.stringify({ userRoles: updatedRoles }, null, 2), 'utf8');
+}, 60000);
 
 client.on("interactionCreate", async interaction => {
     if(!interaction.isButton()) return
@@ -85,6 +168,82 @@ client.on("interactionCreate", async interaction => {
     }
 
 })
+
+client.on("interactionCreate", interaction => {
+    if (!interaction.isCommand()) return;
+
+    if(interaction.commandName == "temprole-add") {
+        let member = interaction.options.getMember("membro");
+        let role = interaction.options.getRole("ruolo");
+        let duration = interaction.options.getNumber("durata");
+        let reason = interaction.options.getString("motivo") || "Non presente";
+
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
+    
+        if(member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro ha già il ruolo", ephemeral: true})}
+        
+            member.roles.add(role)
+
+
+            const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
+            temprolesData.userRoles.push({
+                userId: member.id,
+                roleId: role.id,
+                guildId: interaction.guild.id,
+                expiresAt: Date.now() + duration * 86400000
+            });
+            fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), 'utf8')
+
+
+
+
+            let embed = new Discord.EmbedBuilder()
+                .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
+                .setFields({
+                    name: "Durata:",
+                    value: `${duration} giorni`
+                }, {
+                    name: "Motivo:",
+                    value: reason
+                })
+                .setColor("Green")
+
+            return interaction.reply({ embeds: [embed]})
+
+
+        
+
+        
+
+    }
+
+    if(interaction.commandName == "temprole-remove") {
+        let member = interaction.options.getMember("membro");
+        let role = interaction.options.getRole("ruolo");
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
+
+        if(!member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro deve ancora avere il ruolo", ephemeral: true})}
+
+        
+        member.roles.remove(role)
+
+        let embed = new Discord.EmbedBuilder()
+            .setDescription(`✅ Rimosso ${role} a ${member.user.username}`)
+            .setColor("Red")
+
+        interaction.reply({ embeds: [embed]})
+        
+    }
+    
+})
+
+
+
+
+
+
 
 
 client.on("interactionCreate", interaction => {
@@ -408,9 +567,3 @@ client.on("messageCreate", message => {
         }
     }
 })
-
-
-
-
-
-
