@@ -19,6 +19,7 @@ const client = new Discord.Client(
 )
 
 
+
 require('dotenv').config();
 
 const { icon } = require("./fileresources.json")
@@ -58,7 +59,7 @@ client.on("ready", () => {
                 }
             ]
         })
-
+        
         
         
         guild.commands.create({
@@ -79,7 +80,7 @@ client.on("ready", () => {
                 }
             ]
         })
-
+        
         guild.commands.create({
             name: "add",
             description: "Aggiunge un utente al ticket",
@@ -92,7 +93,7 @@ client.on("ready", () => {
                 }
             ]
         })
-
+        
         guild.commands.create({
             name: "remove",
             description: "Rimuove un utente dal ticket",
@@ -114,9 +115,47 @@ client.on("ready", () => {
     
     
     
-
-        
+    
+    
 })
+
+
+const { createCanvas, loadImage } = require("canvas")
+
+client.on("guildMemberAdd", async member => {
+
+    let canvas = await createCanvas(1700, 600)
+    let ctx = await canvas.getContext("2d")
+
+    let img = await loadImage("./resources/background.png")
+
+    ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2)
+
+    ctx.fillStyle = "rgba(0,0,0,0.30)"
+    ctx.fillRect(70, 70, canvas.width - 70 - 70, canvas.height - 70 - 70)
+
+    ctx.save()
+
+    ctx.beginPath()
+    ctx.arc(150 + 300 / 2, canvas.height / 2, 150, 0, 2 * Math.PI, false)
+    ctx.clip()
+    img = await loadImage(member.displayAvatarURL({ format: "png"}))
+    ctx.drawImage(img, 150, canvas.height / 2 - 300 / 2, 300, 300)
+    ctx.restore()
+
+    let channel = client.channels.cache.get("1278025672673071204")
+
+    let attachment = new Discord.AttachmentBuilder(canvas.toBuffer(), "canvas.png")
+
+    let embed = new Discord.EmbedBuilder()
+        .setTitle("**Benvenuto**")
+        .setDescription(`Benvenuto <@${member.user.id}> nel server di Italian RP.\n Inizia il tuo percorso leggendo il <#1292932800873369600>,\n successivamente vai su Roblox ed entra su Italian RP.`)
+        .setColor("Blue")
+        .setImage("attachment://canvas.png")
+
+    channel.send({ embeds: [embed], files: [attachment]})
+})
+
 
 /*client.on("messageCreate", message => {
     if (message.content == "!ticketsassistenzanuovo1") {
