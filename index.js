@@ -169,6 +169,35 @@ client.on("interactionCreate", async interaction => {
 
 })
 
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+    const fs = require('fs');
+    const path = './temproles.json';
+
+    // Carica i dati attuali
+    const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
+
+    // Trova i ruoli rimossi
+    const removedRoles = oldMember.roles.cache.filter(role => !newMember.roles.cache.has(role.id));
+
+    if (removedRoles.size > 0) {
+        let updatedRoles = temprolesData.userRoles;
+
+        // Rimuovi i ruoli trovati dalla lista temporanea
+        removedRoles.forEach(removedRole => {
+            updatedRoles = updatedRoles.filter(entry => {
+                if (entry.roleId === removedRole.id && entry.userId === newMember.id) {
+                    console.log(`Ruolo manualmente rimosso: ${removedRole.name} (${removedRole.id}) dall'utente ${newMember.user.tag}`);
+                    return false; // Rimuovi l'entry
+                }
+                return true;
+            });
+        });
+
+        // Salva i dati aggiornati
+        fs.writeFileSync(path, JSON.stringify({ userRoles: updatedRoles }, null, 2), 'utf8');
+    }
+});
+
 client.on("interactionCreate", interaction => {
     if (!interaction.isCommand()) return;
 
