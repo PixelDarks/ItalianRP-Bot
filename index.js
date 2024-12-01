@@ -18,7 +18,12 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.DirectMessages]}
 )
 
+const { AuditLogEvent } = require('discord.js');
 
+async function getUserbyId(userId) {
+    const user = client.users.fetch(userId)
+    return user;
+}
 
 require('dotenv').config();
 
@@ -120,15 +125,20 @@ client.on("ready", () => {
 })
 
 
-const { createCanvas, loadImage } = require("canvas")
+const { createCanvas, loadImage, registerFont } = require("canvas")
+
+registerFont("./font/roboto.ttf", {family: "Roboto"})
+registerFont("./font/robotoBold.ttf", {family: "RobotoBold"})
 
 client.on("guildMemberAdd", async member => {
 
     let canvas = await createCanvas(1700, 600)
     let ctx = await canvas.getContext("2d")
 
-    let img = await loadImage("./resources/background.png")
-
+    console.log("Caricando immagine di sfondo...");
+    var img = await loadImage("./resources/background.png");
+    console.log("Immagine di sfondo caricata");
+    
     ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2)
 
     ctx.fillStyle = "rgba(0,0,0,0.30)"
@@ -139,9 +149,27 @@ client.on("guildMemberAdd", async member => {
     ctx.beginPath()
     ctx.arc(150 + 300 / 2, canvas.height / 2, 150, 0, 2 * Math.PI, false)
     ctx.clip()
-    img = await loadImage(member.displayAvatarURL({ format: "png"}))
-    ctx.drawImage(img, 150, canvas.height / 2 - 300 / 2, 300, 300)
+
+    
+    console.log("Caricando immagine dell'avatar...");
+    var img2 = await loadImage(member.user.displayAvatarURL({ extension: "png"}));
+    console.log("Immagine dell'avatar caricata");
+    
+    
+    ctx.drawImage(img2, 150, canvas.height / 2 - 300 / 2, 300, 300)
     ctx.restore()
+
+    ctx.fillStyle = "#fff"
+    ctx.textBaseline = "middle"
+
+    ctx.font = "80px Roboto"
+    ctx.fillText("Benvenuto/a", 500, 200)
+
+    ctx.font = "100px RobotoBold"
+    ctx.fillText(member.user.username.slice(0, 25), 500, canvas.height / 2)
+
+    ctx.font = "50px Roboto"
+    ctx.fillText(`${member.guild.memberCount}° membro`, 500, 400)
 
     let channel = client.channels.cache.get("1278025672673071204")
 
@@ -149,8 +177,8 @@ client.on("guildMemberAdd", async member => {
 
     let embed = new Discord.EmbedBuilder()
         .setTitle("**Benvenuto**")
-        .setDescription(`Benvenuto <@${member.user.id}> nel server di Italian RP.\n Inizia il tuo percorso leggendo il <#1292932800873369600>,\n successivamente vai su Roblox ed entra su Italian RP.`)
-        .setColor("Blue")
+        .setDescription(`Benvenuto/a <@${member.user.id}> nel server di Italian RP.\n Inizia il tuo percorso leggendo il <#1292932800873369600>,\n successivamente vai su Roblox ed entra su Italian RP.`)
+        .setColor("Purple")
         .setImage("attachment://canvas.png")
 
     channel.send({ embeds: [embed], files: [attachment]})
@@ -270,6 +298,122 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
         fs.writeFileSync(path, JSON.stringify({ userRoles: updatedRoles }, null, 2), 'utf8');
     }
 });
+
+client.on("guildMemberUpdate", (oldMember, newMember) => {
+
+
+    const canale = client.channels.cache.get("1287008759561846826")
+
+    const oldRoles = oldMember.roles.cache;
+
+    const newRoles = newMember.roles.cache
+
+    const addedRoles = newRoles.filter(role => !oldRoles.has(role.id))
+    const removedRoles = oldRoles.filter(role => !newRoles.has(role.id))
+
+    if (addedRoles.size > 0) {
+        addedRoles.forEach(role => {
+            let embed = new Discord.EmbedBuilder()
+                .setAuthor({
+                    name: newMember.user.username,
+                    iconURL: newMember.user.displayAvatarURL({ extension: "png"})
+                })
+                .setThumbnail(newMember.user.displayAvatarURL())
+                .setDescription(`${newMember.user.tag} è stato aggiornato`)
+                .setFields({
+                    name: "Ruoli: ",
+                    value: `✅ ${role.name}`
+                })
+                .setColor("Green")
+                .setFooter({
+                    text: "Italian RP",
+                    iconURL: client.user.displayAvatarURL()
+                })
+
+            canale.send({embeds: [embed]})
+
+        })
+    }
+
+    if (removedRoles.size > 0) {
+        removedRoles.forEach(role => {
+            let embed = new Discord.EmbedBuilder()
+                .setAuthor({
+                    name: newMember.user.username,
+                    iconURL: newMember.user.displayAvatarURL({ extension: "png"})
+                })
+                .setThumbnail(newMember.user.displayAvatarURL())
+                .setDescription(`${newMember.user.tag} è stato aggiornato`)
+                .setFields({
+                    name: "Ruoli: ",
+                    value: `❌ <@&${role.id}>`
+                })
+                .setColor("Red")
+                .setFooter({
+                    text: "Italian RP",
+                    iconURL: client.user.displayAvatarURL()
+                })
+
+            canale.send({embeds: [embed]})
+
+        })
+    }
+    
+
+
+    
+
+})
+
+client.on("guildMemberRemove", async member => {
+    try {
+        const fetchedLogs = await member.guild.fetchAuditLogs({
+            limit: 1,
+            type: AuditLogEvent.MemberKick,
+        });
+        const kickLog = fetchedLogs.entries.first();
+
+        // Controllo che il log sia valido e recente
+        if (!kickLog) return console.log(`${member.user.tag} ha lasciato il server (non espulso)`);
+
+        const { executor, target, reason } = kickLog;
+        if (target.id === member.id) {
+           
+            const logChannel = member.guild.channels.cache.find(
+                (channel) => channel.id === '1312882762675650641'
+            ); 
+            if (logChannel && logChannel.isTextBased()) {
+
+                let embed = new Discord.EmbedBuilder() 
+                    .setAuthor({
+                        name: member.user.username,
+                        iconURL: member.user.displayAvatarURL({ extension: "png"})
+                    })
+                    .setColor("Red")
+                    .setDescription(`<@${member.user.id}> è stato espulso`)
+                    .addFields({
+                        name: "Moderatore",
+                        value: `<@executor.id>`,
+                        inline: true
+                    },
+                    {
+                        name: "Motivo",
+                        value: reason || "Nessun motivo fornito",
+                        inline: true
+                    })
+                    .setThumbnail(member.user.displayAvatarURL())
+                logChannel.send({embeds: [embed]});
+            } else {
+                console.log(`Canale log non trovato per ${member.user.tag}`);
+            }
+        } else {
+            console.log(`${member.user.tag} ha lasciato il server (non espulso)`);
+        }
+    } catch (error) {
+        console.error(`Errore nel gestire la rimozione di ${member.user.tag}:`, error);
+    }
+})
+
 
 client.on("interactionCreate", interaction => {
     if (!interaction.isCommand()) return;
@@ -392,7 +536,7 @@ client.on("interactionCreate", interaction => {
                         .addFields(
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
                             {name: `Descrizione Problema: `, value: userInput, inline: false},
-                            {name: `Con Vip: `, value: `<@&1289639280473280624>`, inline: false}
+                            {name: `Con Vip: `, value: `Sì`, inline: false}
                         )
                         let deletebutton = new Discord.ButtonBuilder()
                             .setLabel("Elimina")
@@ -415,6 +559,15 @@ client.on("interactionCreate", interaction => {
                     
                     canale.send({embeds: [embed], components: [rowsettings]})
 
+                    canale.send({content: "<@&1289639280473280624>", allowedMentions: {roles: ["1289639280473280624"]}
+                    }).then(message => {
+                        setTimeout(() => {
+                            message.delete()
+                            .catch(err => console.error('Errore durante l\'eliminazione del messaggio:', err));
+                        }, 1000)
+                    })
+                    
+
                 } else {
 
                     let embed = new Discord.EmbedBuilder()
@@ -428,7 +581,8 @@ client.on("interactionCreate", interaction => {
                         })
                         .addFields(
                             {name: `Utente: `, value: `<@${user.id}>`, inline: true},
-                            {name: `Descrizione Problema: `, value: userInput, inline: false}
+                            {name: `Descrizione Problema: `, value: userInput, inline: false},
+                            {name: `Con Vip: `, value: `No`, inline: false}
                         )
                         let deletebutton = new Discord.ButtonBuilder()
                             .setLabel("Elimina")
@@ -461,8 +615,6 @@ client.on("interactionCreate", interaction => {
 )
 
 client.on("interactionCreate", async interaction => {
-    var user = interaction.user;
-    var server = interaction.guild;
 
     if (!interaction.isButton()) return;
 
@@ -510,18 +662,17 @@ client.on("interactionCreate", async interaction => {
         })
 
         let attachment = new Discord.AttachmentBuilder(Buffer.from(chatLog, "utf-8"), { name:`chatLog-channel-${interaction.channel.id}.txt`, contentType: "text/plain"})
-    
-        let guild = interaction.guild;
 
-        let utente = guild.members.cache.find(m => m.user.username === interaction.channel.name)
+        let topicChannel = interaction.channel.topic.slice(9)
+        let utente = await getUserbyId(topicChannel)
 
         let embed = new Discord.EmbedBuilder()
             .setAuthor({
-                name: interaction.channel.name,
-                iconURL: utente.user.avatarURL()
+                name: utente.username,
+                iconURL: utente.avatarURL()
             })
             .addFields(
-                {name: `Mittente: `, value: `<@${utente.user.id}>`, inline: true},
+                {name: `Mittente: `, value: `<@${utente.id}>`, inline: true},
                 {name: `Nome del ticket: `, value: interaction.channel.name, inline: false}
             )
             .setColor("Green")
