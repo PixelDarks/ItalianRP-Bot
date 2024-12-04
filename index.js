@@ -2,6 +2,7 @@ const Discord = require("discord.js")
 const fs = require('fs')
 const path = './temproles.json'
 const pathToFFmpeg = "D:/Percorso/Della/Cartella/FFmpeg/bin/ffmpeg.exe";
+const { REST } = require("discord.js")
 
 process.env.FFMPEG_PATH = pathToFFmpeg
 
@@ -22,7 +23,16 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.DirectMessages]}
 )
 
+client.commands = new Discord.Collection()
+
 const { AuditLogEvent } = require('discord.js');
+
+const rest = new REST().setToken(process.env.TOKEN)
+
+//await rest.put(
+   // Discord.Routes.applicationCommands(client.user.id),
+   // { body: commands}
+//)
 
 async function getUserbyId(userId) {
     const user = client.users.fetch(userId)
@@ -573,70 +583,71 @@ client.on("guildBanAdd", async (ban) => {
 client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
 
-    if(interaction.commandName == "temprole-add") {
-        let member = interaction.options.getMember("membro");
-        let role = interaction.options.getRole("ruolo");
-        let duration = interaction.options.getNumber("durata");
-        let reason = interaction.options.getString("motivo") || "Non presente";
-
-
-        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
     
-        if(member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro ha già il ruolo", ephemeral: true})}
+    if(interaction.commandName == "temprole-add") {
+            let member = interaction.options.getMember("membro");
+            let role = interaction.options.getRole("ruolo");
+            let duration = interaction.options.getNumber("durata");
+            let reason = interaction.options.getString("motivo") || "Non presente";
+    
+    
+            if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
         
-            member.roles.add(role)
-
-
-            const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
-            temprolesData.userRoles.push({
-                userId: member.id,
-                roleId: role.id,
-                guildId: interaction.guild.id,
-                expiresAt: Date.now() + duration * 86400000
-            });
-            fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), 'utf8')
-
-
-
-
-            let embed = new Discord.EmbedBuilder()
-                .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
-                .setFields({
-                    name: "Durata:",
-                    value: `${duration} giorni`
-                }, {
-                    name: "Motivo:",
-                    value: reason
-                })
-                .setColor("Green")
-
-            return interaction.reply({ embeds: [embed]})
-
-
-        
-
-        
-
+            if(member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro ha già il ruolo", ephemeral: true})}
+            
+                member.roles.add(role)
+    
+    
+                const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
+                temprolesData.userRoles.push({
+                    userId: member.id,
+                    roleId: role.id,
+                    guildId: interaction.guild.id,
+                    expiresAt: Date.now() + duration * 86400000
+                });
+                fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), 'utf8')
+    
+    
+    
+    
+                let embed = new Discord.EmbedBuilder()
+                    .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
+                    .setFields({
+                        name: "Durata:",
+                        value: `${duration} giorni`
+                    }, {
+                        name: "Motivo:",
+                        value: reason
+                    })
+                    .setColor("Green")
+    
+                return interaction.reply({ embeds: [embed]})
+    
+    
+            
+    
+            
+    
     }
-
+    
     if(interaction.commandName == "temprole-remove") {
-        let member = interaction.options.getMember("membro");
-        let role = interaction.options.getRole("ruolo");
-
-        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
-
-        if(!member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro deve ancora avere il ruolo", ephemeral: true})}
-
-        
-        member.roles.remove(role)
-
-        let embed = new Discord.EmbedBuilder()
-            .setDescription(`✅ Rimosso ${role} a ${member.user.username}`)
-            .setColor("Red")
-
-        interaction.reply({ embeds: [embed]})
-        
-    }
+            let member = interaction.options.getMember("membro");
+            let role = interaction.options.getRole("ruolo");
+    
+            if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
+    
+            if(!member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro deve ancora avere il ruolo", ephemeral: true})}
+    
+            
+            member.roles.remove(role)
+    
+            let embed = new Discord.EmbedBuilder()
+                .setDescription(`✅ Rimosso ${role} a ${member.user.username}`)
+                .setColor("Red")
+    
+            interaction.reply({ embeds: [embed]})
+            
+    } 
 
     if(interaction.commandName == "convoca") {
         let member = interaction.options.getMember("membro")
