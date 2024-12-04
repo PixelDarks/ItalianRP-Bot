@@ -1,11 +1,15 @@
 const Discord = require("discord.js")
 const fs = require('fs')
 const path = './temproles.json'
+const pathToFFmpeg = "D:/Percorso/Della/Cartella/FFmpeg/bin/ffmpeg.exe";
+
+process.env.FFMPEG_PATH = pathToFFmpeg
 
 const client = new Discord.Client(
     {intents:[
         Discord.GatewayIntentBits.Guilds,
         Discord.GatewayIntentBits.GuildMembers,
+        Discord.GatewayIntentBits.GuildModeration,
         Discord.GatewayIntentBits.GuildMessages,
         Discord.GatewayIntentBits.MessageContent,   
         Discord.GatewayIntentBits.GuildEmojisAndStickers,
@@ -27,9 +31,14 @@ async function getUserbyId(userId) {
 
 require('dotenv').config();
 
+
 const { icon } = require("./fileresources.json")
 
 client.login(process.env.TOKEN);
+
+const serverid = new Map()
+
+const ifbotcommand = new Map();
 
 client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
@@ -85,6 +94,25 @@ client.on("ready", () => {
                 }
             ]
         })
+
+        guild.commands.create({
+            name: "convoca",
+            description: "Convoca un utente in assistenza",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "amount",
+                    description: "Scrivi la quantità di convocazioni",
+                    type: Discord.ApplicationCommandOptionType.Integer,
+                    required: false
+                }
+            ]
+        })
         
         guild.commands.create({
             name: "add",
@@ -111,24 +139,90 @@ client.on("ready", () => {
                 }
             ]
         })
+
+        guild.commands.create({
+            name: "clear",
+            description: "Elimina un numero di messaggi da un canale",
+            options: [
+                {
+                    name: "quantità",
+                    description: "Scrivi la quantità",
+                    type: Discord.ApplicationCommandOptionType.Integer,
+                    required: true
+                }
+            ]
+        })
+
+        guild.commands.create({
+            name: "kick",
+            description: "Espelle un membro dal server",
+            options: [
+                {
+                    name: "membro",
+                    description: "Definisci il membro",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
+
+
+        guild.commands.create({
+            name: "ban",
+            description: "Banna un membro dal server",
+            options: [
+                {
+                    name: "membro",
+                    description: "Definisci il membro",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
         
+        serverid.set("serverid", guild.id)
         
         
     })
     
     
-    
-    
-    
-    
-    
 })
 
 
-const { createCanvas, loadImage, registerFont } = require("canvas")
+setInterval(function () {
+    let memberchannel = client.channels.cache.get("1297245091110457444");
+
+    let membercount = client.guilds.cache.get(serverid.get("serverid")).memberCount;
+
+    memberchannel.setName(`🙋| Membri: ${membercount}`);
+
+    let staffchannel = client.channels.cache.get("1276904045960892530");
+
+    let staffcount = client.guilds.cache.get(serverid.get("serverid")).roles.cache.get("1276959088047034490").members.size
+
+    staffchannel.setName(`🕵| Staff: ${staffcount}`)
+    
+}, 10000)
+
+const { createCanvas, loadImage, registerFont } = require("canvas");
+const { channel } = require("diagnostics_channel");
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
 
 registerFont("./font/roboto.ttf", {family: "Roboto"})
 registerFont("./font/robotoBold.ttf", {family: "RobotoBold"})
+
 
 client.on("guildMemberAdd", async member => {
 
@@ -365,6 +459,16 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 
 })
 
+function getRealModerator(executor) {
+    if (executor.id == client.user.id) {
+        const moderatorid = ifbotcommand.get("moderatorid")
+        ifbotcommand.delete("moderatorid")
+        return moderatorid;
+    }
+
+    return executor.id
+}
+
 client.on("guildMemberRemove", async member => {
     try {
         const fetchedLogs = await member.guild.fetchAuditLogs({
@@ -377,12 +481,15 @@ client.on("guildMemberRemove", async member => {
         if (!kickLog) return console.log(`${member.user.tag} ha lasciato il server (non espulso)`);
 
         const { executor, target, reason } = kickLog;
+
         if (target.id === member.id) {
            
             const logChannel = member.guild.channels.cache.find(
                 (channel) => channel.id === '1312882762675650641'
             ); 
             if (logChannel && logChannel.isTextBased()) {
+
+                const realexecutor = getRealModerator(executor)
 
                 let embed = new Discord.EmbedBuilder() 
                     .setAuthor({
@@ -393,7 +500,7 @@ client.on("guildMemberRemove", async member => {
                     .setDescription(`<@${member.user.id}> è stato espulso`)
                     .addFields({
                         name: "Moderatore",
-                        value: `<@executor.id>`,
+                        value: `<@${realexecutor}>`,
                         inline: true
                     },
                     {
@@ -414,8 +521,56 @@ client.on("guildMemberRemove", async member => {
     }
 })
 
+client.on("guildBanAdd", async (ban) => {
+    try {
+        const logChannel = ban.guild.channels.cache.find(
+            (channel) => channel.id === "1287010063990521866"
+        )
 
-client.on("interactionCreate", interaction => {
+        const logs = await ban.guild.fetchAuditLogs({
+            limit: 1,
+            type: AuditLogEvent.MemberBanAdd
+        })
+
+        const banlogs = logs.entries.first()
+
+        if (!banlogs) {
+            console.log("Nessun log di ban trovato.");
+            return;
+        }
+
+        const { executor, reason } = banlogs
+
+        let embed = new Discord.EmbedBuilder()
+            .setAuthor({ name: ban.user.username, iconURL: ban.user.displayAvatarURL({ extension: "png"})})
+            .setDescription(`${ban.user.username} è stato bannato`)
+            .addFields({
+                name: "Moderatore",
+                value: `<@${executor.id}>`,
+                inline: true
+            },
+            {
+                name: "Motivo",
+                value: reason || "Nessun motivo fornito",
+                inline: true
+            })
+            .setColor("DarkRed")
+            .setThumbnail(ban.user.displayAvatarURL({ extension: "png"}))
+
+        if (logChannel && logChannel.isTextBased()) {
+
+            logChannel.send({ embeds: [embed]})
+        } else {
+            return console.log("LogChannel non è un canale testuale")
+        }
+
+
+    } catch (error) {
+        console.error("Errore nel log del ban: ", error)
+    }
+})
+
+client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
 
     if(interaction.commandName == "temprole-add") {
@@ -482,7 +637,163 @@ client.on("interactionCreate", interaction => {
         interaction.reply({ embeds: [embed]})
         
     }
+
+    if(interaction.commandName == "convoca") {
+        let member = interaction.options.getMember("membro")
+        let amount = interaction.options.getInteger("amount") || 1
+        
+        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "**Non sei uno staff**", ephemeral: true})}
+        
+        if (interaction.channel.id !== "1276965741035388948") {
+            return interaction.reply({ content: "**Puoi convocare utenti solo in <#1276965741035388948>**", ephemeral: true})
+        }
+
+        let channel = interaction.member.voice.channel
+
+        if (!channel) {
+            return interaction.reply({ content: "Non sei in un canale vocale", ephemeral: true})
+        }
+
+        if (channel) {
+            let assistenza = [
+                "1276969421901926505", "1276972289522663538", "1276972399836790868",
+                "1276972500328251422", "1276972546193100924", "1276972586835644546",
+                "1276972627378044958", "1276972666850508955", "1276972706033569863",
+                "1276972751663534154", "1297131516010299432"
+            ]
+
+            if (!assistenza.includes(channel.id)) {
+                return interaction.reply({ content: "**Sei in un canale vocale, ma non in un canale vocale per assistenza**", ephemeral: true})
+            }
+
+            const guild = interaction.guild;
+
+            let targetvoiceChannel = guild.members.cache.get(member.user.id).voice.channel
+
+            if (interaction.member.user.id == member.user.id) {
+                return interaction.reply({ content: `**Non puoi convocare te stesso.**`, ephemeral: true})
+            }
+
+            
+            if (targetvoiceChannel && targetvoiceChannel.id === channel.id) {
+                return interaction.reply({ content: `<@${member.user.id}> **è già in assistenza con te.**`, ephemeral: true})
+            }
+            
+            if (amount < 0 || amount > 10) {
+                return interaction.reply({ content: `La quantità ha un minimo di 1 e un massimo di 10`, ephemeral: true });
+            }
+            
+            if (amount > 1) {
+                for (let i = 0; i < amount; i++) {
+                    interaction.channel.send({ content: `<@${member.user.id}> **CONVOCATO IN** <#${channel.id}>`, allowedMentions: {users: [`${member.user.id}`]}})
+                    
+                    if (i == amount - 1) {
+                        await interaction.reply({ content: `Inviate ${amount} convocazioni`, ephemeral: true });
+                        break
+                    }
+                }
+            } else {
+                interaction.reply({ content: `<@${member.user.id}> **CONVOCATO IN** <#${channel.id}>`, allowedMentions: {users: [`${member.user.id}`]}})
+            }
+                
+            
+            
+            
+            if (member.user.id == client.user.id) {
+                const connection = joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: channel.guild.id,
+                    adapterCreator: channel.guild.voiceAdapterCreator
+                })
+
+                const player = createAudioPlayer();
+                const resource = createAudioResource("./resources/easteregg.mp3")
+                player.play(resource);
+                connection.subscribe(player)
+            }
+        }
+    }
     
+    if(interaction.commandName == "clear") {
+        let amount = interaction.options.getInteger("quantità")
+
+        if (amount < 1 || amount > 100) {
+            return interaction.reply({ content: "Per favore fornisci un numero valido tra 1 e 100.", ephemeral: true });
+        }
+    
+        // Verifica se il bot ha il permesso di eliminare i messaggi
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {
+            return interaction.reply({ content: "Non hai il permesso di eliminare messaggi.", ephemeral: true });
+        }
+
+        try {
+            await interaction.deferReply()
+            await interaction.followUp({ content: `${amount} messaggi sono stati eliminati.`, ephemeral: true });
+            await interaction.channel.bulkDelete(amount + 1, true)
+        } catch (err) {
+            console.error(err)
+            return interaction.followUp({ content: "Si è verificato un errore durante l'eliminazione dei messaggi.", ephemeral: true });
+        }
+    
+    }
+
+    if(interaction.commandName == "kick") {
+        let member = interaction.options.getMember("membro")
+        let reason = interaction.options.getString("motivo") || "Nessun motivo"
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({content: "Non sei uno staff", ephemeral: true})}
+
+        if (!member.kickable) {return interaction.reply({content: "Non puoi espellere membri importanti", ephemeral: true})}
+
+        if (member.roles.cache.has("1277980184695406633") || member.roles.cache.has("1277978978371502090")) {return interaction.reply({content: "Non puoi espellere membri importanti dello staff", ephemeral: true})}
+
+        try {
+            member.kick(reason)
+            ifbotcommand.set("moderatorid", interaction.user.id)
+            interaction.reply({ content: `Hai espulso ${member.user.username} dal server`, ephemeral: true})
+        } catch(error) {
+            console.error(`Errore durante l'espulsione: ${error}`)
+        }
+
+
+
+
+
+
+        
+
+
+    }
+
+    if(interaction.commandName == "ban") {
+        let member = interaction.options.getMember("membro")
+        let reasonban = interaction.options.getString("motivo") || "Nessun motivo"
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({content: "Non sei uno staff", ephemeral: true})}
+
+        if (!member.bannable) {return interaction.reply({content: "Non puoi bannare membri importanti", ephemeral: true})}
+
+        if (member.roles.cache.has("1277980184695406633") || member.roles.cache.has("1277978978371502090")) {return interaction.reply({content: "Non puoi bannare membri importanti dello staff", ephemeral: true})}
+
+        try {
+            await member.ban({ reason: reasonban})
+            member.ban()
+            ifbotcommand.set("moderatorid", interaction.user.id)
+            interaction.reply({ content: `Hai bannato ${member.user.username} dal server`, ephemeral: true})
+        } catch (error) {
+            console.error(`Errore durante il ban: ${error}`)
+            interaction.reply({ content: "Si è verificato un errore durante il ban del membro.", ephemeral: true });
+        }
+
+
+
+
+
+
+        
+
+
+    }
 })
 
 
@@ -818,3 +1129,4 @@ client.on("interactionCreate", interaction => {
         }
     }
 })
+
