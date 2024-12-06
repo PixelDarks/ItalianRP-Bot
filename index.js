@@ -201,9 +201,9 @@ client.on("ready", () => {
                 }
             ]
         })
+
         
-        serverid.set("serverid", guild.id)
-        
+        serverid.set("serverid", "1276898638509113476")
         
     })
     
@@ -211,10 +211,11 @@ client.on("ready", () => {
 })
 
 
+
 setInterval(function () {
     let memberchannel = client.channels.cache.get("1297245091110457444");
 
-    let membercount = client.guilds.cache.get(serverid.get("serverid")).memberCount;
+    let membercount = client.guilds.cache.get(serverid.get("serverid")).memberCount
 
     memberchannel.setName(`🙋| Membri: ${membercount}`);
 
@@ -805,6 +806,7 @@ client.on("interactionCreate", async interaction => {
 
 
     }
+
 })
 
 
