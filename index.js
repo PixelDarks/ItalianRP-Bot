@@ -33,23 +33,23 @@ const { AuditLogEvent } = require('discord.js');
     // { body: commands}
     //)
     
-    async function getUserbyId(userId) {
+async function getUserbyId(userId) {
         const user = client.users.fetch(userId)
         return user;
     }
     
-    require('dotenv').config();
+require('dotenv').config();
     
     
-    const { icon } = require("./fileresources.json")
+const { icon } = require("./fileresources.json")
     
-    client.login(process.env.TOKEN);
+client.login(process.env.TOKEN);
     
-    const serverid = new Map()
+const serverid = new Map()
     
-    const ifbotcommand = new Map();
+const ifbotcommand = new Map();
     
-    client.on("ready", () => {
+client.on("ready", () => {
         console.log("Il bot è stato correttamente avviato.")
         client.guilds.cache.forEach(guild => {
             guild.commands.create({
@@ -115,7 +115,7 @@ const { AuditLogEvent } = require('discord.js');
                         required: true
                     },
                     {
-                        name: "amount",
+                        name: "quantità",
                         description: "Scrivi la quantità di convocazioni",
                         type: Discord.ApplicationCommandOptionType.Integer,
                         required: false
@@ -224,7 +224,7 @@ const { AuditLogEvent } = require('discord.js');
         })
         
         
-    })
+})
     
 
 
@@ -233,7 +233,6 @@ setInterval(function () {
 
     const scheduledTime = ["12:00", "15:30", "19:00"]
 
-    const path = "./resources/ServerOn.gif"
     
     if (typeof lastSentTime === 'undefined') {
         lastSentTime = null;
@@ -242,16 +241,14 @@ setInterval(function () {
     if (scheduledTime.includes(current) && current !== lastSentTime) {
         const channel = client.channels.cache.get("1276937473200623626")
 
-        let attachment = new Discord.AttachmentBuilder(path)
+        
 
         let embed = new Discord.EmbedBuilder()
-            .setTitle("Roleplay On")
-            .setDescription("Ti auguriamo un buon roleplay.\n<@&1276923411498795100>")
+            .setDescription("<:IRP:1294760298951081995>Ricordo che il server è on<:IRP:1294760298951081995>\nEntrate sulla mappa Roblox e godetevi l'RP.\n")
             .setColor("Green")
             .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
-            .setImage("attachment://ServerOn.gif")
 
-        channel.send({ embeds: [embed], files: [attachment]})
+        channel.send({ embeds: [embed], content: "@everyone"})
 
         lastSentTime = current
     }
@@ -275,7 +272,6 @@ setInterval(function () {
 }, 10000)
 
 const { createCanvas, loadImage, registerFont } = require("canvas");
-const { channel } = require("diagnostics_channel");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
 
 registerFont("./font/roboto.ttf", {family: "roboto"})
@@ -283,6 +279,8 @@ registerFont("./font/robotoBold.ttf", {family: "robotoBold"})
 
 
 client.on("guildMemberAdd", async member => {
+
+    let roleid = "1276923411498795100"
 
     let canvas = await createCanvas(1700, 600)
     let ctx = await canvas.getContext("2d")
@@ -334,6 +332,9 @@ client.on("guildMemberAdd", async member => {
         .setImage("attachment://canvas.png")
 
     channel.send({ embeds: [embed], files: [attachment]})
+
+    member.roles.add(roleid)
+    console.log("Ruolo Cittadino di Italian RP aggiunto a " + member.user.username)
 })
 
 
@@ -445,13 +446,23 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
                 return true;
             });
         });
-
+        
         // Salva i dati aggiornati
         fs.writeFileSync(path, JSON.stringify({ userRoles: updatedRoles }, null, 2), 'utf8');
     }
 });
 
-client.on("guildMemberUpdate", (oldMember, newMember) => {
+function getRealModerator(executor) {
+    if (executor.id == client.user.id) {
+        const moderatorid = ifbotcommand.get("moderatorid")
+        ifbotcommand.delete("moderatorid")
+        return moderatorid;
+    }
+
+    return executor.id
+}
+
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
 
 
     const canale = client.channels.cache.get("1287008759561846826")
@@ -463,18 +474,36 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
     const addedRoles = newRoles.filter(role => !oldRoles.has(role.id))
     const removedRoles = oldRoles.filter(role => !newRoles.has(role.id))
 
+    const logs = await newMember.guild.fetchAuditLogs({
+        limit: 1,
+        type: AuditLogEvent.MemberRoleUpdate
+    })
+
+    const roleslogs = logs.entries.first()
+
+    if (!roleslogs) {
+        console.log("Nessun log di ruoli trovato.");
+        return;
+    }
+
+    const { executor } = roleslogs
+
     if (addedRoles.size > 0) {
         addedRoles.forEach(role => {
+            const realexecutor = getRealModerator(executor)
             let embed = new Discord.EmbedBuilder()
                 .setAuthor({
                     name: newMember.user.username,
                     iconURL: newMember.user.displayAvatarURL({ extension: "png"})
                 })
                 .setThumbnail(newMember.user.displayAvatarURL())
-                .setDescription(`${newMember.user.tag} è stato aggiornato`)
+                .setDescription(`<@${newMember.user.id}> è stato aggiornato`)
                 .setFields({
                     name: "Ruoli: ",
                     value: `✅ <@&${role.id}>`
+                },{
+                    name: "Moderatore:",
+                    value: `<@${realexecutor}>`
                 })
                 .setColor("Green")
                 .setFooter({
@@ -489,16 +518,20 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 
     if (removedRoles.size > 0) {
         removedRoles.forEach(role => {
+            const realexecutor = getRealModerator(executor)
             let embed = new Discord.EmbedBuilder()
                 .setAuthor({
                     name: newMember.user.username,
                     iconURL: newMember.user.displayAvatarURL({ extension: "png"})
                 })
                 .setThumbnail(newMember.user.displayAvatarURL())
-                .setDescription(`${newMember.user.tag} è stato aggiornato`)
+                .setDescription(`<@${newMember.user.id}> è stato aggiornato`)
                 .setFields({
                     name: "Ruoli: ",
                     value: `❌ <@&${role.id}>`
+                },{
+                    name: "Moderatore:",
+                    value: `<@${realexecutor}>`
                 })
                 .setColor("Red")
                 .setFooter({
@@ -517,15 +550,6 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
 
 })
 
-function getRealModerator(executor) {
-    if (executor.id == client.user.id) {
-        const moderatorid = ifbotcommand.get("moderatorid")
-        ifbotcommand.delete("moderatorid")
-        return moderatorid;
-    }
-
-    return executor.id
-}
 
 client.on("guildMemberRemove", async member => {
     try {
@@ -667,6 +691,7 @@ client.on("interactionCreate", async interaction => {
     
     
     
+                ifbotcommand.set("moderatorid", interaction.user.id)
     
                 let embed = new Discord.EmbedBuilder()
                     .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
@@ -678,6 +703,7 @@ client.on("interactionCreate", async interaction => {
                         value: reason
                     })
                     .setColor("Green")
+
     
                 return interaction.reply({ embeds: [embed]})
     
@@ -698,6 +724,7 @@ client.on("interactionCreate", async interaction => {
     
             
             member.roles.remove(role)
+            ifbotcommand.set("moderatorid", interaction.user.id)
     
             let embed = new Discord.EmbedBuilder()
                 .setDescription(`✅ Rimosso ${role} a ${member.user.username}`)
@@ -709,7 +736,7 @@ client.on("interactionCreate", async interaction => {
 
     if(interaction.commandName == "convoca") {
         let member = interaction.options.getMember("membro")
-        let amount = interaction.options.getInteger("amount") || 1
+        let amount = interaction.options.getInteger("quantità") || 1
         
         if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "**Non sei uno staff**", ephemeral: true})}
         
