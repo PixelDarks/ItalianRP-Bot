@@ -2,7 +2,7 @@ const Discord = require("discord.js")
 const fs = require('fs')
 const path = './temproles.json'
 const pathToFFmpeg = "D:/Percorso/Della/Cartella/FFmpeg/bin/ffmpeg.exe";
-const { REST } = require("discord.js")
+const { REST, Routes } = require("discord.js")
 
 process.env.FFMPEG_PATH = pathToFFmpeg
 
@@ -27,189 +27,236 @@ client.commands = new Discord.Collection()
 
 const { AuditLogEvent } = require('discord.js');
 
-const rest = new REST().setToken(process.env.TOKEN)
 
 //await rest.put(
-   // Discord.Routes.applicationCommands(client.user.id),
-   // { body: commands}
-//)
+    // Discord.Routes.applicationCommands(client.user.id),
+    // { body: commands}
+    //)
+    
+    async function getUserbyId(userId) {
+        const user = client.users.fetch(userId)
+        return user;
+    }
+    
+    require('dotenv').config();
+    
+    
+    const { icon } = require("./fileresources.json")
+    
+    client.login(process.env.TOKEN);
+    
+    const serverid = new Map()
+    
+    const ifbotcommand = new Map();
+    
+    client.on("ready", () => {
+        console.log("Il bot è stato correttamente avviato.")
+        client.guilds.cache.forEach(guild => {
+            guild.commands.create({
+                name: "temprole-add",
+                description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Seleziona l'utente",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    },
+                    {
+                        name: "ruolo",
+                        description: "Seleziona il ruolo",
+                        type: Discord.ApplicationCommandOptionType.Role,
+                        required: true
+                    },
+                    {
+                        name: "durata",
+                        description: "Scrivi la durata (sarà in giorni)",
+                        type: Discord.ApplicationCommandOptionType.Number,
+                        required: true
+                    },
+                    {
+                        name: "motivo",
+                        description: "Scrivi il motivo",
+                        type: Discord.ApplicationCommandOptionType.String,
+                        required: false
+                    }
+                ]
+            })
+            
+            
+            
+            guild.commands.create({
+                name: "temprole-remove",
+                description: "Rimuove un ruolo specifico ad un utente",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Seleziona l'utente",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    },
+                    {
+                        name: "ruolo",
+                        description: "Seleziona il ruolo",
+                        type: Discord.ApplicationCommandOptionType.Role,
+                        required: true
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "convoca",
+                description: "Convoca un utente in assistenza",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Seleziona l'utente",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    },
+                    {
+                        name: "amount",
+                        description: "Scrivi la quantità di convocazioni",
+                        type: Discord.ApplicationCommandOptionType.Integer,
+                        required: false
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "add",
+                description: "Aggiunge un utente al ticket",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Seleziona l'utente",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "remove",
+                description: "Rimuove un utente dal ticket",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Seleziona l'utente",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "clear",
+                description: "Elimina un numero di messaggi da un canale",
+                options: [
+                    {
+                        name: "quantità",
+                        description: "Scrivi la quantità",
+                        type: Discord.ApplicationCommandOptionType.Integer,
+                        required: true
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "kick",
+                description: "Espelle un membro dal server",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Definisci il membro",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    },
+                    {
+                        name: "motivo",
+                        description: "Scrivi il motivo",
+                        type: Discord.ApplicationCommandOptionType.String,
+                        required: false
+                    }
+                ]
+            })
+            
+            
+            guild.commands.create({
+                name: "ban",
+                description: "Banna un membro dal server",
+                options: [
+                    {
+                        name: "membro",
+                        description: "Definisci il membro",
+                        type: Discord.ApplicationCommandOptionType.User,
+                        required: true
+                    },
+                    {
+                        name: "motivo",
+                        description: "Scrivi il motivo",
+                        type: Discord.ApplicationCommandOptionType.String,
+                        required: false
+                    }
+                ]
+            })
+            
+            guild.commands.create({
+                name: "serverlink",
+                description: "Mostra il link del server Roblox"
+            })
+            
+            guild.commands.create({
+                name: "serverinfo",
+                description: "Mostra le informazioni del server"
+            })
+            
+            
+            serverid.set("serverid", "1276898638509113476")
 
-async function getUserbyId(userId) {
-    const user = client.users.fetch(userId)
-    return user;
-}
-
-require('dotenv').config();
-
-
-const { icon } = require("./fileresources.json")
-
-client.login(process.env.TOKEN);
-
-const serverid = new Map()
-
-const ifbotcommand = new Map();
-
-client.on("ready", () => {
-    console.log("Il bot è stato correttamente avviato.")
-    client.guilds.cache.forEach(guild => {
-        guild.commands.create({
-            name: "temprole-add",
-            description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
-            options: [
-                {
-                    name: "membro",
-                    description: "Seleziona l'utente",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                },
-                {
-                    name: "ruolo",
-                    description: "Seleziona il ruolo",
-                    type: Discord.ApplicationCommandOptionType.Role,
-                    required: true
-                },
-                {
-                    name: "durata",
-                    description: "Scrivi la durata (sarà in giorni)",
-                    type: Discord.ApplicationCommandOptionType.Number,
-                    required: true
-                },
-                {
-                    name: "motivo",
-                    description: "Scrivi il motivo",
-                    type: Discord.ApplicationCommandOptionType.String,
-                    required: false
-                }
-            ]
+            //ELIMINA COMANDI
+            
+            //const rest = new REST().setToken(process.env.TOKEN)
+            
+            //rest.delete(Routes.applicationCommand(client.user.id, "commandid"))
+                //.then(() => console.log("Comando eliminato"))
+                //.catch(console.error)
         })
         
-        
-        
-        guild.commands.create({
-            name: "temprole-remove",
-            description: "Rimuove un ruolo specifico ad un utente",
-            options: [
-                {
-                    name: "membro",
-                    description: "Seleziona l'utente",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                },
-                {
-                    name: "ruolo",
-                    description: "Seleziona il ruolo",
-                    type: Discord.ApplicationCommandOptionType.Role,
-                    required: true
-                }
-            ]
-        })
-
-        guild.commands.create({
-            name: "convoca",
-            description: "Convoca un utente in assistenza",
-            options: [
-                {
-                    name: "membro",
-                    description: "Seleziona l'utente",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                },
-                {
-                    name: "amount",
-                    description: "Scrivi la quantità di convocazioni",
-                    type: Discord.ApplicationCommandOptionType.Integer,
-                    required: false
-                }
-            ]
-        })
-        
-        guild.commands.create({
-            name: "add",
-            description: "Aggiunge un utente al ticket",
-            options: [
-                {
-                    name: "membro",
-                    description: "Seleziona l'utente",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                }
-            ]
-        })
-        
-        guild.commands.create({
-            name: "remove",
-            description: "Rimuove un utente dal ticket",
-            options: [
-                {
-                    name: "membro",
-                    description: "Seleziona l'utente",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                }
-            ]
-        })
-
-        guild.commands.create({
-            name: "clear",
-            description: "Elimina un numero di messaggi da un canale",
-            options: [
-                {
-                    name: "quantità",
-                    description: "Scrivi la quantità",
-                    type: Discord.ApplicationCommandOptionType.Integer,
-                    required: true
-                }
-            ]
-        })
-
-        guild.commands.create({
-            name: "kick",
-            description: "Espelle un membro dal server",
-            options: [
-                {
-                    name: "membro",
-                    description: "Definisci il membro",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                },
-                {
-                    name: "motivo",
-                    description: "Scrivi il motivo",
-                    type: Discord.ApplicationCommandOptionType.String,
-                    required: false
-                }
-            ]
-        })
-
-
-        guild.commands.create({
-            name: "ban",
-            description: "Banna un membro dal server",
-            options: [
-                {
-                    name: "membro",
-                    description: "Definisci il membro",
-                    type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                },
-                {
-                    name: "motivo",
-                    description: "Scrivi il motivo",
-                    type: Discord.ApplicationCommandOptionType.String,
-                    required: false
-                }
-            ]
-        })
-
-        
-        serverid.set("serverid", "1276898638509113476")
         
     })
     
-    
-})
 
+
+setInterval(function () {
+    const current = new Date().toLocaleTimeString(['it-IT'], {hour: '2-digit', minute: '2-digit'})
+
+    const scheduledTime = ["12:00", "15:30", "19:00"]
+
+    const path = "./resources/ServerOn.gif"
+    
+    if (typeof lastSentTime === 'undefined') {
+        lastSentTime = null;
+    }
+
+    if (scheduledTime.includes(current) && current !== lastSentTime) {
+        const channel = client.channels.cache.get("1276937473200623626")
+
+        let attachment = new Discord.AttachmentBuilder(path)
+
+        let embed = new Discord.EmbedBuilder()
+            .setTitle("Roleplay On")
+            .setDescription("Ti auguriamo un buon roleplay.\n<@&1276923411498795100>")
+            .setColor("Green")
+            .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
+            .setImage("attachment://ServerOn.gif")
+
+        channel.send({ embeds: [embed], files: [attachment]})
+
+        lastSentTime = current
+    }
+
+}, 10000)
 
 
 setInterval(function () {
@@ -231,8 +278,8 @@ const { createCanvas, loadImage, registerFont } = require("canvas");
 const { channel } = require("diagnostics_channel");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
 
-registerFont("./font/roboto.ttf", {family: "Roboto"})
-registerFont("./font/robotoBold.ttf", {family: "RobotoBold"})
+registerFont("./font/roboto.ttf", {family: "roboto"})
+registerFont("./font/robotoBold.ttf", {family: "robotoBold"})
 
 
 client.on("guildMemberAdd", async member => {
@@ -427,7 +474,7 @@ client.on("guildMemberUpdate", (oldMember, newMember) => {
                 .setDescription(`${newMember.user.tag} è stato aggiornato`)
                 .setFields({
                     name: "Ruoli: ",
-                    value: `✅ ${role.name}`
+                    value: `✅ <@&${role.id}>`
                 })
                 .setColor("Green")
                 .setFooter({
@@ -595,7 +642,17 @@ client.on("interactionCreate", async interaction => {
             if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
         
             if(member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro ha già il ruolo", ephemeral: true})}
-            
+                
+                const highestrole = interaction.guild.members.me.roles.highest
+
+                
+
+                if (role.position >= highestrole.position) {
+                    console.error('Il ruolo che stai cercando di assegnare è troppo alto!');
+                    interaction.reply({ content: "Non dispongo dei permessi necessari per assegnarti questo ruolo", ephemeral: true})
+                    return;
+                }
+
                 member.roles.add(role)
     
     
@@ -807,6 +864,62 @@ client.on("interactionCreate", async interaction => {
 
     }
 
+    if(interaction.commandName == "serverlink") {
+        let embed = new Discord.EmbedBuilder()
+            .setTitle("Link del Server Roblox")
+            .setDescription("Ecco qui il link del server Roblox")
+            .addFields({
+                name: "Link:",
+                value: "dadada",
+                inline: true
+            })
+            .setColor("Green")
+            .setFooter({
+                text: "Italian RP",
+                iconURL: client.user.displayAvatarURL({ extension: 'png'})
+            })
+            .setThumbnail(client.user.displayAvatarURL({ extension: 'png'}))
+        interaction.reply({ embeds: [embed], ephemeral: true})
+    }
+
+    if(interaction.commandName == "serverinfo") {
+        let server = interaction.guild;
+        let members = await server.members.fetch()
+        let bots = members.filter(member => member.user.bot).size
+
+        let embed = new Discord.EmbedBuilder()
+            .setTitle("Italian RP")
+            .setDescription("Tutte le info su questo server")
+            .addFields({
+                name: "Owner:",
+                value: `<@989918527257452564>`,
+                inline: true
+            },{
+                name: "Membri:",
+                value: `${server.memberCount}`,
+                inline: true
+            },{
+                name: "Staff:",
+                value: `${server.roles.cache.get("1276959088047034490").members.size}`,
+                inline: true
+            },{
+                name: "Descrizione Server:",
+                value: "Server per un RP Italiana su Roblox",
+                inline: true
+            },{
+                name: "Bots:",
+                value: `${bots}`,
+                inline: false
+            })
+            .setColor("Green")
+            .setFooter({
+                text: "Italian RP",
+                iconURL: client.user.displayAvatarURL({ extension: 'png'})
+            })
+            .setThumbnail(icon)
+        interaction.reply({ embeds: [embed], ephemeral: true})
+    }
+
 })
 
 
@@ -943,6 +1056,12 @@ client.on("interactionCreate", async interaction => {
     if (!interaction.isButton()) return;
 
     if (interaction.customId === "deletebutton") {
+
+        if (!interaction.member.roles.cache.has("1289639280473280624")) {
+            interaction.reply({ content: "Il bottone è riservato agli staff", ephemeral: true, components: [], embeds: []})
+            return
+        }
+
         interaction.deferUpdate()
 
         interaction.channel.delete()
@@ -1006,6 +1125,8 @@ client.on("interactionCreate", async interaction => {
 
     }
 })
+
+//TICKETS ADD E REMOVE
 
 const getAllMessages = async (channel) => {
     let allMessages = []
