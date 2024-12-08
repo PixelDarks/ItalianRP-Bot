@@ -954,7 +954,7 @@ client.on("interactionCreate", async interaction => {
     }
 
     if(interaction.commandName == "fineassistenza") {
-        if (!interaction.member.roles.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff"})}
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff"})}
 
         let modal = new Discord.ModalBuilder()
             .setCustomId("modalassistenza")
@@ -972,8 +972,8 @@ client.on("interactionCreate", async interaction => {
         let input2 = new Discord.TextInputBuilder()
             .setCustomId("solved")
             .setLabel("Sei riuscito ad aiutarlo? (Si | No)")
-            .setMinLength(2)
-            .setMaxLength(2)
+            .setMinLength(1)
+            .setMaxLength(100)
             .setPlaceholder("Scrivi qui...")
             .setStyle(Discord.TextInputStyle.Short)
             .setRequired(true)
@@ -981,7 +981,7 @@ client.on("interactionCreate", async interaction => {
         let input3 = new Discord.TextInputBuilder()
             .setCustomId("how")
             .setLabel("Come l'hai aiutato? (Salta la domanda se è no)")
-            .setMinLength(1)
+            .setMinLength(0)
             .setMaxLength(100)
             .setPlaceholder("Scrivi qui...")
             .setStyle(Discord.TextInputStyle.Paragraph)
