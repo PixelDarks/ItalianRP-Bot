@@ -1032,28 +1032,55 @@ client.on("interactionCreate", async interaction => {
 
         if (!allowedChannels.includes(interaction.channel.id)) {return interaction.reply({content: "Non puoi usare questo comando qui", ephemeral: true})}
         
-        let modal = new Discord.ModalBuilder()
-            .setCustomId("modalcreazioni")
-            .setTitle("Creazioni Developer")
-
-        let input1 = new Discord.TextInputBuilder()
-            .setCustomId("creation")
-            .setLabel("Creazione")
-            .setMinLength(1)
-            .setMaxLength(200)
-            .setPlaceholder("Scrivi qui...")
-            .setStyle(Discord.TextInputStyle.Paragraph)
-            .setRequired(true)
-
-        let row = new Discord.ActionRowBuilder()
-            .addComponents(input1)
-
-        
-
-        modal.addComponents(row)
+        if (interaction.channel.id == "1284805046395207723") {
+            let modal = new Discord.ModalBuilder()
+                .setCustomId("modalcreazioni")
+                .setTitle("Creazione Developer")
     
+            let input1 = new Discord.TextInputBuilder()
+                .setCustomId("creation")
+                .setLabel("Creazione")
+                .setMinLength(1)
+                .setMaxLength(200)
+                .setPlaceholder("Scrivi qui...")
+                .setStyle(Discord.TextInputStyle.Paragraph)
+                .setRequired(true)
+    
+            let row = new Discord.ActionRowBuilder()
+                .addComponents(input1)
+    
+            
+    
+            modal.addComponents(row)
+        
+    
+            await interaction.showModal(modal)
+        }
 
-        await interaction.showModal(modal)
+        if (interaction.channel.id == "1307289960197652572") {
+            let modal = new Discord.ModalBuilder()
+                .setCustomId("modalcreazioni")
+                .setTitle("Creazione Ds.Developer")
+    
+            let input1 = new Discord.TextInputBuilder()
+                .setCustomId("creation")
+                .setLabel("Creazione")
+                .setMinLength(1)
+                .setMaxLength(200)
+                .setPlaceholder("Scrivi qui...")
+                .setStyle(Discord.TextInputStyle.Paragraph)
+                .setRequired(true)
+    
+            let row = new Discord.ActionRowBuilder()
+                .addComponents(input1)
+    
+            
+    
+            modal.addComponents(row)
+        
+    
+            await interaction.showModal(modal)
+        }
 
 
     }
