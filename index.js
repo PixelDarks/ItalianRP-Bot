@@ -50,178 +50,184 @@ const serverid = new Map()
 const ifbotcommand = new Map();
     
 client.on("ready", () => {
-        console.log("Il bot è stato correttamente avviato.")
-        client.guilds.cache.forEach(guild => {
-            guild.commands.create({
-                name: "temprole-add",
-                description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Seleziona l'utente",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    },
-                    {
-                        name: "ruolo",
-                        description: "Seleziona il ruolo",
-                        type: Discord.ApplicationCommandOptionType.Role,
-                        required: true
-                    },
-                    {
-                        name: "durata",
-                        description: "Scrivi la durata (sarà in giorni)",
-                        type: Discord.ApplicationCommandOptionType.Number,
-                        required: true
-                    },
-                    {
-                        name: "motivo",
-                        description: "Scrivi il motivo",
-                        type: Discord.ApplicationCommandOptionType.String,
-                        required: false
-                    }
-                ]
-            })
-            
-            
-            
-            guild.commands.create({
-                name: "temprole-remove",
-                description: "Rimuove un ruolo specifico ad un utente",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Seleziona l'utente",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    },
-                    {
-                        name: "ruolo",
-                        description: "Seleziona il ruolo",
-                        type: Discord.ApplicationCommandOptionType.Role,
-                        required: true
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "convoca",
-                description: "Convoca un utente in assistenza",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Seleziona l'utente",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    },
-                    {
-                        name: "quantità",
-                        description: "Scrivi la quantità di convocazioni",
-                        type: Discord.ApplicationCommandOptionType.Integer,
-                        required: false
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "add",
-                description: "Aggiunge un utente al ticket",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Seleziona l'utente",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "remove",
-                description: "Rimuove un utente dal ticket",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Seleziona l'utente",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "clear",
-                description: "Elimina un numero di messaggi da un canale",
-                options: [
-                    {
-                        name: "quantità",
-                        description: "Scrivi la quantità",
-                        type: Discord.ApplicationCommandOptionType.Integer,
-                        required: true
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "kick",
-                description: "Espelle un membro dal server",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Definisci il membro",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    },
-                    {
-                        name: "motivo",
-                        description: "Scrivi il motivo",
-                        type: Discord.ApplicationCommandOptionType.String,
-                        required: false
-                    }
-                ]
-            })
-            
-            
-            guild.commands.create({
-                name: "ban",
-                description: "Banna un membro dal server",
-                options: [
-                    {
-                        name: "membro",
-                        description: "Definisci il membro",
-                        type: Discord.ApplicationCommandOptionType.User,
-                        required: true
-                    },
-                    {
-                        name: "motivo",
-                        description: "Scrivi il motivo",
-                        type: Discord.ApplicationCommandOptionType.String,
-                        required: false
-                    }
-                ]
-            })
-            
-            guild.commands.create({
-                name: "serverlink",
-                description: "Mostra il link del server Roblox"
-            })
-            
-            guild.commands.create({
-                name: "serverinfo",
-                description: "Mostra le informazioni del server"
-            })
-            
-            
-            serverid.set("serverid", "1276898638509113476")
-
-            //ELIMINA COMANDI
-            
-            //const rest = new REST().setToken(process.env.TOKEN)
-            
-            //rest.delete(Routes.applicationCommand(client.user.id, "commandid"))
-                //.then(() => console.log("Comando eliminato"))
-                //.catch(console.error)
+    console.log("Il bot è stato correttamente avviato.")
+    
+    client.guilds.cache.forEach(guild => {
+        guild.commands.create({
+            name: "temprole-add",
+            description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "ruolo",
+                    description: "Seleziona il ruolo",
+                    type: Discord.ApplicationCommandOptionType.Role,
+                    required: true
+                },
+                {
+                    name: "durata",
+                    description: "Scrivi la durata (sarà in giorni)",
+                    type: Discord.ApplicationCommandOptionType.Number,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
         })
+        
+        
+        
+        guild.commands.create({
+            name: "temprole-remove",
+            description: "Rimuove un ruolo specifico ad un utente",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "ruolo",
+                    description: "Seleziona il ruolo",
+                    type: Discord.ApplicationCommandOptionType.Role,
+                    required: true
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "convoca",
+            description: "Convoca un utente in assistenza",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "quantità",
+                    description: "Scrivi la quantità di convocazioni",
+                    type: Discord.ApplicationCommandOptionType.Integer,
+                    required: false
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "add",
+            description: "Aggiunge un utente al ticket",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "remove",
+            description: "Rimuove un utente dal ticket",
+            options: [
+                {
+                    name: "membro",
+                    description: "Seleziona l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "clear",
+            description: "Elimina un numero di messaggi da un canale",
+            options: [
+                {
+                    name: "quantità",
+                    description: "Scrivi la quantità",
+                    type: Discord.ApplicationCommandOptionType.Integer,
+                    required: true
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "kick",
+            description: "Espelle un membro dal server",
+            options: [
+                {
+                    name: "membro",
+                    description: "Definisci il membro",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
+        
+        
+        guild.commands.create({
+            name: "ban",
+            description: "Banna un membro dal server",
+            options: [
+                {
+                    name: "membro",
+                    description: "Definisci il membro",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Scrivi il motivo",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
+        
+        guild.commands.create({
+            name: "serverlink",
+            description: "Mostra il link del server Roblox"
+        })
+        
+        guild.commands.create({
+            name: "serverinfo",
+            description: "Mostra le informazioni del server"
+        })
+
+        guild.commands.create({
+            name: "fineassistenza",
+            description: "Usa il comando quando avrai terminato un'assistenza (vocale)"
+        })
+        
+        
+        serverid.set("serverid", "1276898638509113476")
+    
+        //ELIMINA COMANDI
+        
+        //const rest = new REST().setToken(process.env.TOKEN)
+        
+        //rest.delete(Routes.applicationCommand(client.user.id, "commandid"))
+            //.then(() => console.log("Comando eliminato"))
+            //.catch(console.error)
+    })
         
         
 })
@@ -248,7 +254,7 @@ setInterval(function () {
             .setColor("Green")
             .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
 
-        channel.send({ embeds: [embed], content: "@everyone"})
+        channel.send({ embeds: [embed], content: "@everyone", files: [], components: []})
 
         lastSentTime = current
     }
@@ -947,6 +953,59 @@ client.on("interactionCreate", async interaction => {
         interaction.reply({ embeds: [embed], ephemeral: true})
     }
 
+    if(interaction.commandName == "fineassistenza") {
+        if (!interaction.member.roles.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff"})}
+
+        let modal = new Discord.ModalBuilder()
+            .setCustomId("modalassistenza")
+            .setTitle("Resoconto Assistenza")
+
+        let input1 = new Discord.TextInputBuilder()
+            .setCustomId("problem")
+            .setLabel("Problema/Informazione")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Short)
+            .setRequired(true)
+
+        let input2 = new Discord.TextInputBuilder()
+            .setCustomId("solved")
+            .setLabel("Sei riuscito ad aiutarlo? (Si | No)")
+            .setMinLength(2)
+            .setMaxLength(2)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Short)
+            .setRequired(true)
+
+        let input3 = new Discord.TextInputBuilder()
+            .setCustomId("how")
+            .setLabel("Come l'hai aiutato? (Salta la domanda se è no)")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Paragraph)
+            .setRequired(false)
+
+        let input4 = new Discord.TextInputBuilder()
+            .setCustomId("nickname")
+            .setLabel("Tag Discord (Username dell'aiutato)")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Paragraph)
+            .setRequired(true)
+
+        let row = new Discord.ActionRowBuilder()
+            .addComponents(input1, input2, input3, input4)
+
+        modal.addComponents(row)
+
+        await interaction.showModal(modal)
+
+
+    }
+
 })
 
 
@@ -1071,7 +1130,30 @@ client.on("interactionCreate", interaction => {
                 }
             })
         }
+        if(interaction.customId === "modalassistenza") {
+            let problem = interaction.fields.getTextInputValue("problem")
+            let solved = interaction.fields.getTextInputValue("solved")
+            let how = interaction.fields.getTextInputValue("how") || "//"
+            let nickname = interaction.fields.getTextInputValue("nickname")
+
+            let embed = new Discord.EmbedBuilder()
+                .setTitle("**MODULO RESOCONTO ASSISTENZA**")
+                .setAuthor({
+                    name: interaction.user.username,
+                    iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                })
+                .addFields(
+                    {name: "Problema/Informazione", value: problem, inline: true},
+                    {name: "Sei riuscito ad aiutarlo?", value: solved, inline: true},
+                    {name: "Come l'hai aiutato?", value: how, inline: false},
+                    {name: "Tag Discord", value: nickname, inline: false}
+                )
+                .setColor("Gold")
+            
+            interaction.reply({ embeds: [embed]})
+        }
     }
+
 
     
         
