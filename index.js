@@ -1026,7 +1026,9 @@ client.on("interactionCreate", async interaction => {
     if(interaction.commandName == "creazione") {
         let allowedChannels = ["1284805046395207723", "1307289960197652572"]
 
-        if (!interaction.member.roles.cache.has("1307272283999572018") || !interaction.member.roles.cache.has("1307452798568366193") || !interaction.member.roles.cache.has("1289578267787137044") || !interaction.member.roles.cache.has("1289635853215338526") || !interaction.member.roles.cache.has("1289578178838532198") || !interaction.member.roles.cache.has("1289649734818074746")) {return interaction.reply({ content: "Non sei un developer", ephemeral: true})}
+        
+
+        if (!interaction.member.roles.cache.has("1289649734818074746")) {return interaction.reply({ content: "Non sei un developer", ephemeral: true})}
 
         if (!allowedChannels.includes(interaction.channel.id)) {return interaction.reply({content: "Non puoi usare questo comando qui", ephemeral: true})}
         
@@ -1059,7 +1061,7 @@ client.on("interactionCreate", async interaction => {
 })
 
 
-client.on("interactionCreate", interaction => {
+client.on("interactionCreate", async interaction => {
     if (interaction.isModalSubmit()) {
         if(interaction.customId === "modalTicket") {
 
@@ -1205,31 +1207,65 @@ client.on("interactionCreate", interaction => {
         if(interaction.customId === "modalcreazioni") {
             let creation = interaction.fields.getTextInputValue("creation")
 
-            if (interaction.channel.id == "1307289960197652572") {
-                let embed = new Discord.EmbedBuilder()
-                    .setTitle("*CREAZIONE DS.DEVELOPER**")
-                    .setAuthor({
-                        name: interaction.user.username,
-                        iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
-                    })
-                    .setDescription(creation)
-                    .setColor("Blue")
+            await interaction.reply({
+                content: "Perfetto! Ora allega un'immagine che vuoi includere nel tuo messaggio.",
+                ephemeral: true
+            });
+        
             
-                interaction.reply({ embeds: [embed]})
-            }
+            const filter = (m) => m.author.id === interaction.user.id && m.attachments.size > 0;
+            const collector = interaction.channel.createMessageCollector({ filter, time: 60000, max: 1 });
+        
+            collector.on('collect', async (message) => {
+                const attachment = message.attachments.first();
+                if (attachment && attachment.contentType.startsWith('image/')) {
+                    if (interaction.channel.id == "1307289960197652572") {
+                        const embed = new Discord.EmbedBuilder()
+                            .setTitle("**CREAZIONE DS.DEVELOPER**")
+                            .setAuthor({
+                                name: interaction.user.username,
+                                iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                            })
+                            .setDescription(creation)
+                            .setImage(attachment.url)
+                            .setColor("Blue");
+        
+                    
+                        await interaction.followUp({ embeds: [embed] });
+                        message.delete()
+                    }
+                    if (interaction.channel.id == "1284805046395207723") {
+                        const embed = new Discord.EmbedBuilder()
+                            .setTitle("**CREAZIONE DEVELOPER**")
+                            .setAuthor({
+                                name: interaction.user.username,
+                                iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                            })
+                            .setDescription(creation)
+                            .setImage(attachment.url)
+                            .setColor("Blue");
+        
+                    
+                        await interaction.followUp({ embeds: [embed] });
+                        message.delete()
+                    }
+                } else {
+                    await interaction.followUp({
+                        content: "Il file inviato non è un'immagine valida. Riprova.",
+                        ephemeral: true
+                    });
+                }
+            });
+        
+            collector.on('end', (collected, reason) => {
+                if (reason === 'time') {
+                    interaction.followUp({
+                        content: "Non hai allegato un'immagine in tempo. Operazione annullata.",
+                        ephemeral: true
+                    });
+                }
+            });
 
-            if (interaction.channel.id == "1284805046395207723") {
-                let embed = new Discord.EmbedBuilder()
-                    .setTitle("*CREAZIONE DEVELOPER**")
-                    .setAuthor({
-                        name: interaction.user.username,
-                        iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
-                    })
-                    .setDescription(creation)
-                    .setColor("Blue")
-            
-                interaction.reply({ embeds: [embed]})
-            }
         }
     }
 
