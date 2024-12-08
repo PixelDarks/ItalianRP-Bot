@@ -36,7 +36,7 @@ const { AuditLogEvent } = require('discord.js');
 async function getUserbyId(userId) {
         const user = client.users.fetch(userId)
         return user;
-    }
+}
     
 require('dotenv').config();
     
@@ -83,8 +83,6 @@ client.on("ready", () => {
                 }
             ]
         })
-        
-        
         
         guild.commands.create({
             name: "temprole-remove",
@@ -182,7 +180,6 @@ client.on("ready", () => {
             ]
         })
         
-        
         guild.commands.create({
             name: "ban",
             description: "Banna un membro dal server",
@@ -215,6 +212,11 @@ client.on("ready", () => {
         guild.commands.create({
             name: "fineassistenza",
             description: "Usa il comando quando avrai terminato un'assistenza (vocale)"
+        })
+
+        guild.commands.create({
+            name: "creazione",
+            description: "Usa il comando quando avrai creato qualcosa di nuovo"
         })
         
         
@@ -954,8 +956,10 @@ client.on("interactionCreate", async interaction => {
     }
 
     if(interaction.commandName == "fineassistenza") {
-        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff"})}
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff", ephemeral: true})}
 
+        if (interaction.channel.id !== "1278333489695162379") {return interaction.reply({content: "Non puoi usare questo comando qui", ephemeral: true})}
+        
         let modal = new Discord.ModalBuilder()
             .setCustomId("modalassistenza")
             .setTitle("Resoconto Assistenza")
@@ -980,7 +984,7 @@ client.on("interactionCreate", async interaction => {
 
         let input3 = new Discord.TextInputBuilder()
             .setCustomId("how")
-            .setLabel("Come l'hai aiutato? (Salta la domanda se è no)")
+            .setLabel("Come l'hai aiutato?")
             .setMinLength(0)
             .setMaxLength(100)
             .setPlaceholder("Scrivi qui...")
@@ -997,9 +1001,55 @@ client.on("interactionCreate", async interaction => {
             .setRequired(true)
 
         let row = new Discord.ActionRowBuilder()
-            .addComponents(input1, input2, input3, input4)
+            .addComponents(input1)
+
+        let row2 = new Discord.ActionRowBuilder()
+            .addComponents(input2)
+
+        let row3 = new Discord.ActionRowBuilder()
+            .addComponents(input3)
+
+        let row4 = new Discord.ActionRowBuilder()
+            .addComponents(input4)
 
         modal.addComponents(row)
+        modal.addComponents(row2)
+        modal.addComponents(row3)
+        modal.addComponents(row4)
+
+        await interaction.showModal(modal)
+
+
+    }
+
+
+    if(interaction.commandName == "creazione") {
+        let allowedChannels = ["1284805046395207723", "1307289960197652572"]
+
+        if (!interaction.member.roles.cache.has("1307272283999572018") || !interaction.member.roles.cache.has("1307452798568366193") || !interaction.member.roles.cache.has("1289578267787137044") || !interaction.member.roles.cache.has("1289635853215338526") || !interaction.member.roles.cache.has("1289578178838532198") || !interaction.member.roles.cache.has("1289649734818074746")) {return interaction.reply({ content: "Non sei un developer", ephemeral: true})}
+
+        if (!allowedChannels.includes(interaction.channel.id)) {return interaction.reply({content: "Non puoi usare questo comando qui", ephemeral: true})}
+        
+        let modal = new Discord.ModalBuilder()
+            .setCustomId("modalcreazioni")
+            .setTitle("Creazioni Developer")
+
+        let input1 = new Discord.TextInputBuilder()
+            .setCustomId("creation")
+            .setLabel("Creazione")
+            .setMinLength(1)
+            .setMaxLength(200)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Paragraph)
+            .setRequired(true)
+
+        let row = new Discord.ActionRowBuilder()
+            .addComponents(input1)
+
+        
+
+        modal.addComponents(row)
+    
 
         await interaction.showModal(modal)
 
@@ -1151,6 +1201,35 @@ client.on("interactionCreate", interaction => {
                 .setColor("Gold")
             
             interaction.reply({ embeds: [embed]})
+        }
+        if(interaction.customId === "modalcreazioni") {
+            let creation = interaction.fields.getTextInputValue("creation")
+
+            if (interaction.channel.id == "1307289960197652572") {
+                let embed = new Discord.EmbedBuilder()
+                    .setTitle("*CREAZIONE DS.DEVELOPER**")
+                    .setAuthor({
+                        name: interaction.user.username,
+                        iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                    })
+                    .setDescription(creation)
+                    .setColor("Blue")
+            
+                interaction.reply({ embeds: [embed]})
+            }
+
+            if (interaction.channel.id == "1284805046395207723") {
+                let embed = new Discord.EmbedBuilder()
+                    .setTitle("*CREAZIONE DEVELOPER**")
+                    .setAuthor({
+                        name: interaction.user.username,
+                        iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                    })
+                    .setDescription(creation)
+                    .setColor("Blue")
+            
+                interaction.reply({ embeds: [embed]})
+            }
         }
     }
 
