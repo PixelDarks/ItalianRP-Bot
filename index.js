@@ -37,6 +37,11 @@ async function getUserbyId(userId) {
         const user = client.users.fetch(userId)
         return user;
 }
+
+function wait(s) {
+    let ms = s * 1000
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
     
 require('dotenv').config();
     
@@ -45,9 +50,9 @@ const { icon } = require("./fileresources.json")
     
 client.login(process.env.TOKEN);
     
-const serverid = new Map()
-    
 const ifbotcommand = new Map();
+
+let bypassbotcommand = false
     
 client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
@@ -219,14 +224,57 @@ client.on("ready", () => {
             description: "Usa il comando quando avrai creato qualcosa di nuovo"
         })
         
-        
-        serverid.set("serverid", "1276898638509113476")
+        guild.commands.create({
+            name: "blacklist",
+            description: "Usa il comando quando avrai blacklistato qualcuno"
+        })
+
+        guild.commands.create({
+            name: "timeout",
+            description: "Imposta un timeout per un membro",
+            options: [
+                {
+                    name: "utente",
+                    description: "L'utente da mettere in timeout",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "durata",
+                    description: "Durata del timeout in minuti",
+                    type: Discord.ApplicationCommandOptionType.Integer,
+                    required: true
+                },
+                {
+                    name: "motivo",
+                    description: "Motivo del timeout",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+            ]
+        })
+
+        guild.commands.create({
+            name: "untimeout",
+            description: "Imposta un timeout per un membro",
+            options: [
+                {
+                    name: "utente",
+                    description: "L'utente da rimuovere dal timeout",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+
+
+       
     
         //ELIMINA COMANDI
         
         //const rest = new REST().setToken(process.env.TOKEN)
         
-        //rest.delete(Routes.applicationCommand(client.user.id, "commandid"))
+        //rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
             //.then(() => console.log("Comando eliminato"))
             //.catch(console.error)
     })
@@ -252,6 +300,7 @@ setInterval(function () {
         
 
         let embed = new Discord.EmbedBuilder()
+            .setTitle("Server On")
             .setDescription("<:IRP:1294760298951081995>Ricordo che il server è on<:IRP:1294760298951081995>\nEntrate sulla mappa Roblox e godetevi l'RP.\n")
             .setColor("Green")
             .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
@@ -267,17 +316,17 @@ setInterval(function () {
 setInterval(function () {
     let memberchannel = client.channels.cache.get("1297245091110457444");
 
-    let membercount = client.guilds.cache.get(serverid.get("serverid")).memberCount
+    let membercount = client.guilds.cache.get("1276898638509113476").memberCount
 
     memberchannel.setName(`🙋| Membri: ${membercount}`);
 
     let staffchannel = client.channels.cache.get("1276904045960892530");
 
-    let staffcount = client.guilds.cache.get(serverid.get("serverid")).roles.cache.get("1276959088047034490").members.size
+    let staffcount = client.guilds.cache.get("1276898638509113476").roles.cache.get("1276959088047034490").members.size
 
     staffchannel.setName(`🕵| Staff: ${staffcount}`)
     
-}, 10000)
+}, 5000)
 
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
@@ -340,6 +389,8 @@ client.on("guildMemberAdd", async member => {
         .setImage("attachment://canvas.png")
 
     channel.send({ embeds: [embed], files: [attachment]})
+
+    bypassbotcommand = true
 
     member.roles.add(roleid)
     console.log("Ruolo Cittadino di Italian RP aggiunto a " + member.user.username)
@@ -461,12 +512,16 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 function getRealModerator(executor) {
-    if (executor.id == client.user.id) {
+    if (executor.id == client.user.id && bypassbotcommand == false) {
         const moderatorid = ifbotcommand.get("moderatorid")
         ifbotcommand.delete("moderatorid")
         return moderatorid;
     }
 
+    if (bypassbotcommand == true) {
+        bypassbotcommand = false
+        return executor.id
+    }
     return executor.id
 }
 
@@ -558,6 +613,76 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 
 })
 
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+    const oldTimeout = oldMember.communicationDisabledUntilTimestamp
+    const newTimeout = newMember.communicationDisabledUntilTimestamp
+
+    if (!oldTimeout && newTimeout) {
+        const fetchedLogs = await newMember.guild.fetchAuditLogs({
+            limit: 1,
+            type: AuditLogEvent.MemberUpdate
+        })
+
+        const timeoutroles = fetchedLogs.entries.first()
+        if (timeoutroles) {
+            const { executor, target, reason } = timeoutroles
+            if (target.id === newMember.id) {
+                const realexecutor = getRealModerator(executor)
+                const timeoutEnd = new Date(newTimeout);
+
+                const durationMs = timeoutEnd - Date.now(); // Durata in millisecondi
+                const durationMinutes = Math.round(durationMs / 60000); // Converti in minuti
+
+                const duration = durationMinutes.toString() == "1" ? `${durationMinutes} minuto` : `${durationMinutes} minuti`
+
+                let embed = new Discord.EmbedBuilder()
+                    .setAuthor({ name: newMember.user.username, iconURL: newMember.user.displayAvatarURL({ extension: 'png'})})
+                    .setDescription(`<@${newMember.user.id}> è stato messo in timeout`)
+                    .setColor("Red")
+                    .addFields({
+                        name: "Moderatore:",
+                        value: `<@${realexecutor}>`
+                    },{
+                        name: "Motivo:",
+                        value: reason
+                    },{
+                        name: "Durata:",
+                        value: duration
+                    })
+
+                const channel = client.channels.cache.get("1287010367452479488")
+
+                channel.send({ embeds: [embed]})
+            }
+        }
+    }
+
+
+    if (oldTimeout && !newTimeout) {
+        const duration = new Date(newTimeout) - Date.now();
+        const fetchedLogs = await newMember.guild.fetchAuditLogs({
+            limit: 1,
+            type: AuditLogEvent.MemberUpdate
+        })
+
+        const timeoutroles = fetchedLogs.entries.first()
+        if (timeoutroles) {
+            const { target } = timeoutroles
+            if (target.id === newMember.id) {
+                
+
+                let embed = new Discord.EmbedBuilder()
+                    .setAuthor({ name: newMember.user.username, iconURL: newMember.user.displayAvatarURL({ extension: 'png'})})
+                    .setDescription(`Il timeout di <@${newMember.user.id}> è terminato`)
+                    .setColor("DarkGreen")
+
+                const channel = client.channels.cache.get("1287010367452479488")
+
+                channel.send({ embeds: [embed]})
+            }
+        }
+    }
+})
 
 client.on("guildMemberRemove", async member => {
     try {
@@ -1022,7 +1147,6 @@ client.on("interactionCreate", async interaction => {
 
     }
 
-
     if(interaction.commandName == "creazione") {
         let allowedChannels = ["1284805046395207723", "1307289960197652572"]
 
@@ -1041,7 +1165,7 @@ client.on("interactionCreate", async interaction => {
                 .setCustomId("creation")
                 .setLabel("Creazione")
                 .setMinLength(1)
-                .setMaxLength(200)
+                .setMaxLength(999)
                 .setPlaceholder("Scrivi qui...")
                 .setStyle(Discord.TextInputStyle.Paragraph)
                 .setRequired(true)
@@ -1066,7 +1190,7 @@ client.on("interactionCreate", async interaction => {
                 .setCustomId("creation")
                 .setLabel("Creazione")
                 .setMinLength(1)
-                .setMaxLength(200)
+                .setMaxLength(999)
                 .setPlaceholder("Scrivi qui...")
                 .setStyle(Discord.TextInputStyle.Paragraph)
                 .setRequired(true)
@@ -1083,6 +1207,84 @@ client.on("interactionCreate", async interaction => {
         }
 
 
+    }
+
+    if(interaction.commandName == "blacklist") {
+        if (interaction.channel.id !== "1297308966161743872") { return interaction.reply({content: "Non puoi usare questo comando qui", ephemeral: true})}
+
+        let modal = new Discord.ModalBuilder()
+            .setTitle("Modulo Blacklist")
+            .setCustomId("modalblacklist")
+
+        let name = new Discord.TextInputBuilder()
+            .setCustomId("name")
+            .setLabel("Nome Discord (Username)")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Short)
+            .setRequired(true)
+
+        let reason = new Discord.TextInputBuilder()
+            .setCustomId("reason")
+            .setLabel("Motivo")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Short)
+            .setRequired(true)
+
+        let testimoni = new Discord.TextInputBuilder()
+            .setCustomId("testimoni")
+            .setLabel("Testimoni (Username dello Staff)")
+            .setMinLength(1)
+            .setMaxLength(100)
+            .setPlaceholder("Scrivi qui...")
+            .setStyle(Discord.TextInputStyle.Short)
+            .setRequired(false)
+
+        let row1 = new Discord.ActionRowBuilder().addComponents(name)
+        let row2 = new Discord.ActionRowBuilder().addComponents(reason)
+        let row3 = new Discord.ActionRowBuilder().addComponents(testimoni)
+
+        modal.addComponents(row1)
+        modal.addComponents(row2)
+        modal.addComponents(row3)
+        await interaction.showModal(modal)
+    }
+
+    if(interaction.commandName == "timeout") {
+        const member = interaction.options.getMember("utente")
+        const duration = interaction.options.getInteger("durata")
+        const reason = interaction.options.getString("motivo") || "Nessun motivo"
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {return interaction.reply({ content: "Non sei uno staff", ephemeral: true})}
+    
+        if (!member.moderatable) { return interaction.reply({ content: "Impossibile mettere in timeout questo utente", ephemeral: true})}
+        
+        if (member.communicationDisabledUntilTimestamp) {
+            return interaction.reply({ content: "Il membro è già in timeout", ephemeral: true})
+        }
+
+        await member.timeout(duration * 60 * 1000, reason)
+
+        ifbotcommand.set("moderatorid", interaction.user.id)
+
+        return interaction.reply({ content: `Hai messo in timeout con successo <@${member.user.id}> per ${duration} minuti.`, ephemeral: true });
+    }
+    
+    if(interaction.commandName == "untimeout") {
+        const member = interaction.options.getMember("utente")
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non sei uno staff", ephemeral: true})}
+    
+        if (!member.communicationDisabledUntilTimestamp) {
+            return interaction.reply({ content: "Il membro non è in timeout", ephemeral: true})
+        }
+
+        await member.timeout(null)
+
+        return interaction.reply({ content: `Hai tolto dal timeout con successo <@${member.user.id}>`, ephemeral: true });
     }
 
 })
@@ -1260,6 +1462,8 @@ client.on("interactionCreate", async interaction => {
                     
                         await interaction.followUp({ embeds: [embed] });
                         message.delete()
+                        
+                        
                     }
                     if (interaction.channel.id == "1284805046395207723") {
                         const embed = new Discord.EmbedBuilder()
@@ -1274,7 +1478,10 @@ client.on("interactionCreate", async interaction => {
         
                     
                         await interaction.followUp({ embeds: [embed] });
+                        await wait(5)
                         message.delete()
+                        
+                        
                     }
                 } else {
                     await interaction.followUp({
@@ -1294,6 +1501,33 @@ client.on("interactionCreate", async interaction => {
             });
 
         }
+
+        if(interaction.customId === "modalblacklist") {
+            let name = interaction.fields.getTextInputValue("name")
+            let reason = interaction.fields.getTextInputValue("reason")
+            let testimoni = interaction.fields.getTextInputValue("testimoni") || "//"
+
+            let embed = new Discord.EmbedBuilder()
+                .setTitle("**MODULO BLACKLIST**")
+                .addFields({
+                    name: "Nome Discord",
+                    value: name
+                },
+                {
+                    name: "Motivo",
+                    value: reason
+                },
+                {
+                    name: "Testimoni",
+                    value: testimoni
+                })
+                .setColor("Red")
+                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ extension: 'png'})})
+
+            interaction.reply({ embeds: [embed]})
+        }
+
+        
     }
 
 
@@ -1514,4 +1748,5 @@ client.on("interactionCreate", interaction => {
         }
     }
 })
+
 
