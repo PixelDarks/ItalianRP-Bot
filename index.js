@@ -4,6 +4,12 @@ const path = './temproles.json'
 const pathToFFmpeg = "D:/Percorso/Della/Cartella/FFmpeg/bin/ffmpeg.exe";
 const { REST, Routes } = require("discord.js")
 
+
+const { DisTube } = require("distube")
+
+const { YtDlpPlugin } = require("@distube/yt-dlp")
+
+
 process.env.FFMPEG_PATH = pathToFFmpeg
 
 const client = new Discord.Client(
@@ -21,42 +27,56 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.GuildPresences,
         Discord.GatewayIntentBits.GuildMessages,
         Discord.GatewayIntentBits.DirectMessages]}
-)
-
-client.commands = new Discord.Collection()
-
-const { AuditLogEvent } = require('discord.js');
-
-
-//await rest.put(
-    // Discord.Routes.applicationCommands(client.user.id),
-    // { body: commands}
-    //)
+    )
     
-async function getUserbyId(userId) {
-        const user = client.users.fetch(userId)
-        return user;
-}
-
-function wait(s) {
-    let ms = s * 1000
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-    
-require('dotenv').config();
-    
-    
-const { icon } = require("./fileresources.json")
-    
-client.login(process.env.TOKEN);
-    
-const ifbotcommand = new Map();
-
-let bypassbotcommand = false
-    
-client.on("ready", () => {
     console.log("Il bot è stato correttamente avviato.")
     
+    client.commands = new Discord.Collection()
+    
+    const { AuditLogEvent } = require('discord.js');
+    
+    
+    //await rest.put(
+        // Discord.Routes.applicationCommands(client.user.id),
+        // { body: commands}
+        //)
+        
+        async function getUserbyId(userId) {
+            const user = client.users.fetch(userId)
+            return user;
+        }
+        
+        function wait(s) {
+            let ms = s * 1000
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        require('dotenv').config();
+        
+        
+        const { icon } = require("./fileresources.json")
+        
+        client.login(process.env.TOKEN);
+        
+        const ifbotcommand = new Map();
+        
+        let bypassbotcommand = false
+        
+        
+        
+        
+        
+        //ELIMINA COMANDI
+        
+        //const rest = new REST().setToken(process.env.TOKEN)
+        
+        //rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
+        //.then(() => console.log("Comando eliminato"))
+        //.catch(console.error)
+    
+
+
+client.on("ready", () => {
     client.guilds.cache.forEach(guild => {
         guild.commands.create({
             name: "temprole-add",
@@ -213,12 +233,12 @@ client.on("ready", () => {
             name: "serverinfo",
             description: "Mostra le informazioni del server"
         })
-
+        
         guild.commands.create({
             name: "fineassistenza",
             description: "Usa il comando quando avrai terminato un'assistenza (vocale)"
         })
-
+        
         guild.commands.create({
             name: "creazione",
             description: "Usa il comando quando avrai creato qualcosa di nuovo"
@@ -228,7 +248,7 @@ client.on("ready", () => {
             name: "blacklist",
             description: "Usa il comando quando avrai blacklistato qualcuno"
         })
-
+        
         guild.commands.create({
             name: "timeout",
             description: "Imposta un timeout per un membro",
@@ -253,7 +273,7 @@ client.on("ready", () => {
                 }
             ]
         })
-
+        
         guild.commands.create({
             name: "untimeout",
             description: "Imposta un timeout per un membro",
@@ -266,97 +286,95 @@ client.on("ready", () => {
                 }
             ]
         })
-
-
-       
-    
-        //ELIMINA COMANDI
         
-        //const rest = new REST().setToken(process.env.TOKEN)
-        
-        //rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
-            //.then(() => console.log("Comando eliminato"))
-            //.catch(console.error)
-    })
-        
-        
+        guild.commands.create({
+    name: "play",
+    description: "Riproduce una canzone in un canale vocale",
+    options: [
+        {
+            name: "canzone",
+            description: "Nome della canzone",
+            type: Discord.ApplicationCommandOptionType.String,
+            required: true
+        }
+    ]
 })
-    
-
+})})
 
 setInterval(function () {
     const current = new Date().toLocaleTimeString(['it-IT'], {hour: '2-digit', minute: '2-digit'})
-
+    
     const scheduledTime = ["12:00", "15:30", "19:00"]
-
+    
     
     if (typeof lastSentTime === 'undefined') {
         lastSentTime = null;
     }
-
+    
     if (scheduledTime.includes(current) && current !== lastSentTime) {
         const channel = client.channels.cache.get("1276937473200623626")
-
         
-
+        
+        
         let embed = new Discord.EmbedBuilder()
-            .setTitle("Server On")
-            .setDescription("<:IRP:1294760298951081995>Ricordo che il server è on<:IRP:1294760298951081995>\nEntrate sulla mappa Roblox e godetevi l'RP.\n")
-            .setColor("Green")
-            .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
-
+        .setTitle("Server On")
+        .setDescription("<:IRP:1294760298951081995>Ricordo che il server è on<:IRP:1294760298951081995>\nEntrate sulla mappa Roblox e godetevi l'RP.\n")
+        .setColor("Green")
+        .setThumbnail(client.user.displayAvatarURL({ extension: 'png' }))
+        
         channel.send({ embeds: [embed], content: "@everyone", files: [], components: []})
-
+        
         lastSentTime = current
     }
-
+    
 }, 10000)
 
 
 setInterval(function () {
     let memberchannel = client.channels.cache.get("1297245091110457444");
-
+    
     let membercount = client.guilds.cache.get("1276898638509113476").memberCount
-
+    
     memberchannel.setName(`🙋| Membri: ${membercount}`);
-
+    
     let staffchannel = client.channels.cache.get("1276904045960892530");
-
+    
     let staffcount = client.guilds.cache.get("1276898638509113476").roles.cache.get("1276959088047034490").members.size
-
+    
     staffchannel.setName(`🕵| Staff: ${staffcount}`)
     
 }, 5000)
 
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
+const { default: ffmpegPath } = require("ffmpeg-static");
 
 registerFont("./font/roboto.ttf", {family: "roboto"})
 registerFont("./font/robotoBold.ttf", {family: "robotoBold"})
 
 
 client.on("guildMemberAdd", async member => {
-
+    
     let roleid = "1276923411498795100"
-
+    
     let canvas = await createCanvas(1700, 600)
     let ctx = await canvas.getContext("2d")
-
+    
     console.log("Caricando immagine di sfondo...");
     var img = await loadImage("./resources/background.png");
     console.log("Immagine di sfondo caricata");
     
     ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.height / 2)
-
+    
     ctx.fillStyle = "rgba(0,0,0,0.30)"
     ctx.fillRect(70, 70, canvas.width - 70 - 70, canvas.height - 70 - 70)
-
+    
     ctx.save()
-
+    
     ctx.beginPath()
     ctx.arc(150 + 300 / 2, canvas.height / 2, 150, 0, 2 * Math.PI, false)
     ctx.clip()
-
+    
     
     console.log("Caricando immagine dell'avatar...");
     var img2 = await loadImage(member.user.displayAvatarURL({ extension: "png"}));
@@ -365,50 +383,65 @@ client.on("guildMemberAdd", async member => {
     
     ctx.drawImage(img2, 150, canvas.height / 2 - 300 / 2, 300, 300)
     ctx.restore()
-
+    
     ctx.fillStyle = "#fff"
     ctx.textBaseline = "middle"
-
+    
     ctx.font = "80px Roboto"
     ctx.fillText("Benvenuto/a", 500, 200)
-
+    
     ctx.font = "100px RobotoBold"
     ctx.fillText(member.user.username.slice(0, 25), 500, canvas.height / 2)
-
+    
     ctx.font = "50px Roboto"
     ctx.fillText(`${member.guild.memberCount}° membro`, 500, 400)
-
+    
     let channel = client.channels.cache.get("1278025672673071204")
-
+    
     let attachment = new Discord.AttachmentBuilder(canvas.toBuffer(), "canvas.png")
-
+    
     let embed = new Discord.EmbedBuilder()
-        .setTitle("**Benvenuto**")
-        .setDescription(`Benvenuto/a <@${member.user.id}> nel server di Italian RP.\n Inizia il tuo percorso leggendo il <#1292932800873369600>,\n successivamente vai su Roblox ed entra su Italian RP.`)
-        .setColor("Purple")
-        .setImage("attachment://canvas.png")
-
+    .setTitle("**Benvenuto**")
+    .setDescription(`Benvenuto/a <@${member.user.id}> nel server di Italian RP.\n Inizia il tuo percorso leggendo il <#1292932800873369600>,\n successivamente vai su Roblox ed entra su Italian RP.`)
+    .setColor("Purple")
+    .setImage("attachment://canvas.png")
+    
     channel.send({ embeds: [embed], files: [attachment]})
-
+    
     bypassbotcommand = true
-
+    
     member.roles.add(roleid)
     console.log("Ruolo Cittadino di Italian RP aggiunto a " + member.user.username)
 })
 
 
+
+const distube = new DisTube(client, {
+    plugins: [ new YtDlpPlugin()],
+    emitAddListWhenCreatingQueue: true,
+    emitAddSongWhenCreatingQueue: false,
+    emitNewSongOnly: true,
+    nsfw: true,
+    joinNewVoiceChannel: false,
+    ffmpeg: {
+        args: ["-analyzeduration", "0", "-loglevel", "0"],
+        path: "C:/FFmpeg"
+    }
+
+})
+
 /*client.on("messageCreate", message => {
     if (message.content == "!ticketsassistenzanuovo1") {
         let embedhelp = new Discord.EmbedBuilder()
-            .setTitle("Assistenza")
-            .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
-            .setThumbnail(icon)
-            .setColor("Green")
-            .setFooter({
-                text: "Assistenza - IRP",
-                iconURL: icon
+        .setTitle("Assistenza")
+        .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
+        .setThumbnail(icon)
+        .setColor("Green")
+        .setFooter({
+            text: "Assistenza - IRP",
+            iconURL: icon
             })
-        let buttonshelp = new Discord.ButtonBuilder()
+            let buttonshelp = new Discord.ButtonBuilder()
             .setCustomId("buttoncreate")
             .setLabel("Apri un ticket")
             .setStyle("Success")
@@ -1285,6 +1318,33 @@ client.on("interactionCreate", async interaction => {
         await member.timeout(null)
 
         return interaction.reply({ content: `Hai tolto dal timeout con successo <@${member.user.id}>`, ephemeral: true });
+    }
+
+
+    //MUSIC
+
+    if (interaction.commandName == "play") {
+
+        const song = interaction.options.getString("canzone")
+
+        return interaction.reply({ content: "Comando in fase di sviluppo", ephemeral: true})
+
+        const voiceChannel = interaction.member.voice.channel
+        if (!voiceChannel) {
+            return interaction.reply({ content: "Devi essere in un canale vocale", ephemeral: true})
+        }
+
+        const voiceChannelBot = client.guilds.cache.get("1276898638509113476").members.cache.get(client.user.id).voice.channel
+
+        if (voiceChannelBot) {
+            return interaction.reply({ content: "Il bot è già in un altro canale vocale", ephemeral: true})
+        }
+
+        distube.play(voiceChannelBot || voiceChannel, song, {
+            member: interaction.member,
+            textChannel: interaction.channel,
+            message: interaction
+        })
     }
 
 })
