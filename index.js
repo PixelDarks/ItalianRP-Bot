@@ -1497,70 +1497,71 @@ client.on("interactionCreate", async interaction => {
             let creation = interaction.fields.getTextInputValue("creation")
 
             await interaction.reply({
-                content: "Perfetto! Ora allega un'immagine che vuoi includere nel tuo messaggio.",
+                content: "Creazione ricevuta! Controlla i DM per continuare l'operazione",
+                ephemeral: true
+            })
+            try {
+                const dmChannel = await interaction.user.createDM()
+                await dmChannel.send("Perfetto! Ora allega un'immagine che vuoi includere nel tuo messaggio.")
+
+                const filter = (m) => m.author.id === interaction.user.id && m.attachments.size > 0;
+                const collector = dmChannel.createMessageCollector({ filter, time: 60000, max: 1 });
+            
+                collector.on('collect', async (message) => {
+                    const attachment = message.attachments.first();
+                    if (attachment && attachment.contentType.startsWith('image/')) {
+                        
+                            const embed = new Discord.EmbedBuilder()
+                                .setTitle("**CREAZIONE DEVELOPER**")
+                                .setAuthor({
+                                    name: interaction.user.username,
+                                    iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                                })
+                                .setDescription(creation)
+                                .setImage(attachment.url)
+                                .setColor("Blue");
+            
+                            const embed2 = new Discord.EmbedBuilder()
+                                .setTitle("**CREAZIONE DS.DEVELOPER**")
+                                .setAuthor({
+                                    name: interaction.user.username,
+                                    iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
+                                })
+                                .setDescription(creation)
+                                .setImage(attachment.url)
+                                .setColor("Blue");
+                            
+                            const channel = interaction.channel
+                            if (interaction.channel.id == "1307289960197652572") {
+                                await channel.send({ embeds: [embed2] });
+                            } else {
+                                await channel.send({ embeds: [embed]})
+                            }
+                            
+                            await dmChannel.send("Messaggio inviato con successo")
+                            
+
+                    } else {
+                        await dmChannel.send("Messaggio non inviato")
+                    }
+                });
+            
+                collector.on('end', (collected, reason) => {
+                    if (reason === 'time') {
+                        interaction.followUp({
+                            content: "Non hai allegato un'immagine in tempo. Operazione annullata.",
+                            ephemeral: true
+                        });
+                    }
+                });
+
+        } catch (error){
+            console.error(error);
+            await interaction.reply({
+                content: "Non sono riuscito a inviarti un messaggio privato. Assicurati di avere i DM aperti.",
                 ephemeral: true
             });
-        
-            
-            const filter = (m) => m.author.id === interaction.user.id && m.attachments.size > 0;
-            const collector = interaction.channel.createMessageCollector({ filter, time: 60000, max: 1 });
-        
-            collector.on('collect', async (message) => {
-                const attachment = message.attachments.first();
-                if (attachment && attachment.contentType.startsWith('image/')) {
-                    if (interaction.channel.id == "1307289960197652572") {
-                        const embed = new Discord.EmbedBuilder()
-                            .setTitle("**CREAZIONE DS.DEVELOPER**")
-                            .setAuthor({
-                                name: interaction.user.username,
-                                iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
-                            })
-                            .setDescription(creation)
-                            .setImage(attachment.url)
-                            .setColor("Blue");
-        
-                    
-                        await interaction.followUp({ embeds: [embed] });
-                        message.delete()
-                        
-                        
-                    }
-                    if (interaction.channel.id == "1284805046395207723") {
-                        const embed = new Discord.EmbedBuilder()
-                            .setTitle("**CREAZIONE DEVELOPER**")
-                            .setAuthor({
-                                name: interaction.user.username,
-                                iconURL: interaction.user.displayAvatarURL({ extension: 'png' })
-                            })
-                            .setDescription(creation)
-                            .setImage(attachment.url)
-                            .setColor("Blue");
-        
-                    
-                        await interaction.followUp({ embeds: [embed] });
-                        await wait(5)
-                        message.delete()
-                        
-                        
-                    }
-                } else {
-                    await interaction.followUp({
-                        content: "Il file inviato non è un'immagine valida. Riprova.",
-                        ephemeral: true
-                    });
-                }
-            });
-        
-            collector.on('end', (collected, reason) => {
-                if (reason === 'time') {
-                    interaction.followUp({
-                        content: "Non hai allegato un'immagine in tempo. Operazione annullata.",
-                        ephemeral: true
-                    });
-                }
-            });
-
-        }
+        }}
 
         if(interaction.customId === "modalblacklist") {
             let name = interaction.fields.getTextInputValue("name")
