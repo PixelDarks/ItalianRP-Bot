@@ -27,60 +27,55 @@ const client = new Discord.Client(
         Discord.GatewayIntentBits.GuildPresences,
         Discord.GatewayIntentBits.GuildMessages,
         Discord.GatewayIntentBits.DirectMessages]}
-    )
+)
     
-    console.log("Il bot è stato correttamente avviato.")
+console.log("Il bot è stato correttamente avviato.")
     
-    client.commands = new Discord.Collection()
+client.commands = new Discord.Collection()
     
-    const { AuditLogEvent } = require('discord.js');
+const { AuditLogEvent } = require('discord.js');
     
-    
-    //await rest.put(
-        // Discord.Routes.applicationCommands(client.user.id),
-        // { body: commands}
-        //)
+//await rest.put(
+// Discord.Routes.applicationCommands(client.user.id),
+// { body: commands}
+//)
         
-        async function getUserbyId(userId) {
-            const user = client.users.fetch(userId)
-            return user;
-        }
+async function getUserbyId(userId) {
+    const user = client.users.fetch(userId)
+    return user;
+}
         
-        function wait(s) {
-            let ms = s * 1000
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+function wait(s) {
+    let ms = s * 1000
+     return new Promise(resolve => setTimeout(resolve, ms));
+}
         
-        require('dotenv').config();
-        
-        
-        const { icon } = require("./fileresources.json")
-        
-        client.login(process.env.TOKEN);
-        
-        const ifbotcommand = new Map();
-        
-        let bypassbotcommand = false
+require('dotenv').config();
         
         
+const { icon } = require("./fileresources.json")
         
+client.login(process.env.TOKEN);
         
+const ifbotcommand = new Map();
         
-        //ELIMINA COMANDI
+let bypassbotcommand = false    
         
-        //const rest = new REST().setToken(process.env.TOKEN)
+//ELIMINA COMANDI
         
-        //rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
-        //.then(() => console.log("Comando eliminato"))
-        //.catch(console.error)
+//const rest = new REST().setToken(process.env.TOKEN)
+        
+//rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
+//.then(() => console.log("Comando eliminato"))
+//.catch(console.error)
     
 
 
 client.on("ready", () => {
     client.guilds.cache.forEach(guild => {
         guild.commands.create({
-            name: "temprole-add",
-            description: "Aggiunge un ruolo specifico ad un utente per un tempo limitato",
+            name: "warn",
+            description: "Aggiunge un warn specifico ad un utente per un tempo limitato",
             options: [
                 {
                     name: "membro",
@@ -89,8 +84,8 @@ client.on("ready", () => {
                     required: true
                 },
                 {
-                    name: "ruolo",
-                    description: "Seleziona il ruolo",
+                    name: "warn",
+                    description: "Seleziona il warn",
                     type: Discord.ApplicationCommandOptionType.Role,
                     required: true
                 },
@@ -110,8 +105,8 @@ client.on("ready", () => {
         })
         
         guild.commands.create({
-            name: "temprole-remove",
-            description: "Rimuove un ruolo specifico ad un utente",
+            name: "unwarn",
+            description: "Rimuove un warn specifico ad un utente",
             options: [
                 {
                     name: "membro",
@@ -120,8 +115,8 @@ client.on("ready", () => {
                     required: true
                 },
                 {
-                    name: "ruolo",
-                    description: "Seleziona il ruolo",
+                    name: "warn",
+                    description: "Seleziona il warn",
                     type: Discord.ApplicationCommandOptionType.Role,
                     required: true
                 }
@@ -288,17 +283,17 @@ client.on("ready", () => {
         })
         
         guild.commands.create({
-    name: "play",
-    description: "Riproduce una canzone in un canale vocale",
-    options: [
-        {
-            name: "canzone",
-            description: "Nome della canzone",
-            type: Discord.ApplicationCommandOptionType.String,
-            required: true
-        }
-    ]
-})
+            name: "play",
+            description: "Riproduce una canzone in un canale vocale",
+            options: [
+                {
+                    name: "canzone",
+                    description: "Nome della canzone",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: true
+                }
+            ]
+        })
 })})
 
 setInterval(function () {
@@ -329,25 +324,60 @@ setInterval(function () {
     
 }, 10000)
 
+/*const ytch = require("yt-channel-info")
+setInterval(function () {
+    ytch.getChannelVideos("UCRY8qdjm2yL8j0RN2SA50PA", "newest").then(async response => {
+        var idVideo = response.items[0].videoId
+        if (!idVideo) return
+
+        client.channels.cache.get("1276933005302173696").messages.fetch()
+            .then(messages => {
+                var sent = false
+                messages.forEach(msg => {
+                    if (msg.content.includes(idVideo)) sent = true
+                })
+
+                if (!sent) {
+                    const canale1 = client.channels.cache.get("1276933005302173696")
+
+                    let embed = new Discord.EmbedBuilder()
+                        .setTitle("-- ❗NUOVA LIVE❗ --")
+                        .setDescription(`È appena uscita una nuova live sul canale di SamuGamer \n\n https://www.youtube/watch?v=${idVideo}`)
+                        .setThumbnail(client.guilds.cache.get("1276898638509113476").members.cache.get("989918527257452564").user.displayAvatarURL({extension: 'png'}))
+
+                    canale1.send({embeds: [embed]})
+                }
+            })
+    })
+}, 1000 * 30)*/
+
 
 setInterval(function () {
     let memberchannel = client.channels.cache.get("1297245091110457444");
     
-    let membercount = client.guilds.cache.get("1276898638509113476").memberCount
+    try {
+        let membercount = client.guilds.cache.get("1276898638509113476").memberCount
+
+        memberchannel.setName(`🙋| Membri: ${membercount}`);
+
+        let staffchannel = client.channels.cache.get("1276904045960892530");
+        
+        let staffcount = client.guilds.cache.get("1276898638509113476").roles.cache.get("1276959088047034490").members.size
+        
+        staffchannel.setName(`🕵| Staff: ${staffcount}`)
+
+    } catch (err) {
+        console.error("Problemi nelle assegnazione dei membri o staff: ", err)
+    }
     
-    memberchannel.setName(`🙋| Membri: ${membercount}`);
     
-    let staffchannel = client.channels.cache.get("1276904045960892530");
-    
-    let staffcount = client.guilds.cache.get("1276898638509113476").roles.cache.get("1276959088047034490").members.size
-    
-    staffchannel.setName(`🕵| Staff: ${staffcount}`)
     
 }, 5000)
 
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require("@discordjs/voice");
 const { default: ffmpegPath } = require("ffmpeg-static");
+const { channel } = require("diagnostics_channel");
 
 registerFont("./font/roboto.ttf", {family: "roboto"})
 registerFont("./font/robotoBold.ttf", {family: "robotoBold"})
@@ -789,12 +819,15 @@ client.on("guildBanAdd", async (ban) => {
 
         const { executor, reason } = banlogs
 
+        const realexecutor = getRealModerator(executor)
+
         let embed = new Discord.EmbedBuilder()
+
             .setAuthor({ name: ban.user.username, iconURL: ban.user.displayAvatarURL({ extension: "png"})})
             .setDescription(`${ban.user.username} è stato bannato`)
             .addFields({
                 name: "Moderatore",
-                value: `<@${executor.id}>`,
+                value: `<@${realexecutor}>`,
                 inline: true
             },
             {
@@ -822,56 +855,62 @@ client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
 
     
-    if(interaction.commandName == "temprole-add") {
+    if(interaction.commandName == "warn") {
             let member = interaction.options.getMember("membro");
-            let role = interaction.options.getRole("ruolo");
+            let role = interaction.options.getRole("warn");
             let duration = interaction.options.getNumber("durata");
             let reason = interaction.options.getString("motivo") || "Non presente";
+
+            let allowedRoles = ["1284943553209958551", "1284944949091242055", "1286790267847966791", "1289570356595658822"]
     
-    
+            
             if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
+            
+            if (interaction.channel.id !== "1287008127140499508") return interaction.reply({content: "Il warn va assegnato in <#1287008127140499508>", ephemeral: true})
         
-            if(member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro ha già il ruolo", ephemeral: true})}
-                
-                const highestrole = interaction.guild.members.me.roles.highest
+            if (!allowedRoles.includes(role.id)) {return interaction.reply({content: "Questo ruolo non è di tipo warn", ephemeral: true})}
+           
+            
+            member.roles.add(role)
 
-                
 
-                if (role.position >= highestrole.position) {
-                    console.error('Il ruolo che stai cercando di assegnare è troppo alto!');
-                    interaction.reply({ content: "Non dispongo dei permessi necessari per assegnarti questo ruolo", ephemeral: true})
-                    return;
-                }
+            const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
+            temprolesData.userRoles.push({
+                userId: member.id,
+                roleId: role.id,
+                guildId: interaction.guild.id,
+                expiresAt: Date.now() + duration * 86400000
+            });
+            fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), 'utf8')
 
-                member.roles.add(role)
-    
-    
-                const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
-                temprolesData.userRoles.push({
-                    userId: member.id,
-                    roleId: role.id,
-                    guildId: interaction.guild.id,
-                    expiresAt: Date.now() + duration * 86400000
-                });
-                fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), 'utf8')
-    
-    
-    
-                ifbotcommand.set("moderatorid", interaction.user.id)
-    
-                let embed = new Discord.EmbedBuilder()
-                    .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
-                    .setFields({
-                        name: "Durata:",
-                        value: `${duration} giorni`
-                    }, {
-                        name: "Motivo:",
-                        value: reason
-                    })
-                    .setColor("Green")
 
-    
-                return interaction.reply({ embeds: [embed]})
+
+            ifbotcommand.set("moderatorid", interaction.user.id)
+
+            let embed = new Discord.EmbedBuilder()
+                .setDescription(`✅ Aggiunto ${role} a ${member.user.username}`)
+                .setFields({
+                    name: "Durata:",
+                    value: `${duration} giorni`
+                }, {
+                    name: "Motivo:",
+                    value: reason
+                })
+                .setColor("Green")
+
+
+            await interaction.reply({ embeds: [embed]})
+
+            let embed2 = new Discord.EmbedBuilder()
+                .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL({ extension: 'png'})})
+                .setDescription(`L'autore assegna <@&${role.id}> a <@${member.id}>`)
+                .setFields({ name: "Motivo:", value: reason, inline: true})
+                .setFooter({ text: member.user.username, iconURL: member.user.displayAvatarURL({ extension: 'png'})})
+                .setColor("Red")
+
+            client.channels.cache.get("1277145413731880990").send({ embeds: [embed2]})
+
+            
     
     
             
@@ -880,13 +919,15 @@ client.on("interactionCreate", async interaction => {
     
     }
     
-    if(interaction.commandName == "temprole-remove") {
+    if(interaction.commandName == "unwarn") {
             let member = interaction.options.getMember("membro");
-            let role = interaction.options.getRole("ruolo");
+            let role = interaction.options.getRole("warn");
+
+            if (interaction.channel.id !== "1287008127140499508") return interaction.reply({content: "Il warn va tolto in <#1287008127140499508>", ephemeral: true})
     
             if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non hai i permessi per eseguire questo comando", ephemeral: true}) }
     
-            if(!member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro deve ancora avere il ruolo", ephemeral: true})}
+            if(!member.roles.cache.has(role.id)) { return interaction.reply({ content: "Il membro deve ancora avere il warn", ephemeral: true})}
     
             
             member.roles.remove(role)
@@ -1809,5 +1850,50 @@ client.on("interactionCreate", interaction => {
         }
     }
 })
+
+app.use(bodyParser.json());
+
+// Endpoint per inviare l'embed
+app.post('/send-to-discord', async (req, res) => {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+        return res.status(400).json({ message: 'Tutti i campi sono obbligatori!' });
+    }
+
+    try {
+        // Ottieni il canale Discord
+        const channel = discordClient.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
+        if (!channel) {
+            return res.status(500).json({ message: 'Canale Discord non trovato!' });
+        }
+
+        // Crea e invia l'embed
+        const embed = {
+            color: 0x1e90ff,
+            title: 'Nuovo messaggio ricevuto!',
+            fields: [
+                { name: 'Nome:', value: name, inline: true },
+                { name: 'Email:', value: email, inline: true },
+                { name: 'Messaggio:', value: message, inline: false },
+            ],
+            timestamp: new Date(),
+        };
+
+        await channel.send({ embeds: [embed] });
+
+        // Risposta al client
+        res.status(200).json({ message: 'Messaggio inviato a Discord!' });
+    } catch (error) {
+        console.error('Errore durante l\'invio del messaggio a Discord:', error);
+        res.status(500).json({ message: 'Errore durante l\'invio a Discord.' });
+    }
+});
+
+// Avvio del server
+app.listen(PORT, () => {
+    console.log(`Server in esecuzione su http://localhost:${PORT}`);
+});
+
 
 
