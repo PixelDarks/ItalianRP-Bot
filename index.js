@@ -63,11 +63,13 @@ let bypassbotcommand = false
         
 //ELIMINA COMANDI
         
-//const rest = new REST().setToken(process.env.TOKEN)
+/*const rest = new REST().setToken(process.env.TOKEN)
+
+//                                            || Bot ID                || Guild ID           || Command ID
         
-//rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1315675725633687642"))
-//.then(() => console.log("Comando eliminato"))
-//.catch(console.error)
+rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1314617185997422633"))
+    .then(() => console.log("Comando eliminato"))
+    .catch(console.error)*/
     
 
 
@@ -856,6 +858,7 @@ client.on("interactionCreate", async interaction => {
 
     
     if(interaction.commandName == "warn") {
+        try {
             let member = interaction.options.getMember("membro");
             let role = interaction.options.getRole("warn");
             let duration = interaction.options.getNumber("durata");
@@ -909,7 +912,10 @@ client.on("interactionCreate", async interaction => {
                 .setColor("Red")
 
             client.channels.cache.get("1277145413731880990").send({ embeds: [embed2]})
-
+            } catch (err) {
+                console.error(err)
+                return interaction.reply({ content: "Impossibile assegnare il warn a questo membro"})
+            }
             
     
     
@@ -920,6 +926,7 @@ client.on("interactionCreate", async interaction => {
     }
     
     if(interaction.commandName == "unwarn") {
+        try {
             let member = interaction.options.getMember("membro");
             let role = interaction.options.getRole("warn");
 
@@ -938,15 +945,19 @@ client.on("interactionCreate", async interaction => {
                 .setColor("Red")
     
             interaction.reply({ embeds: [embed]})
-            
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile togliere il warn a questo membro"})
+        }
     } 
 
     if(interaction.commandName == "convoca") {
+        try{
         let member = interaction.options.getMember("membro")
         let amount = interaction.options.getInteger("quantità") || 1
         
         if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "**Non sei uno staff**", ephemeral: true})}
-        
+       
         if (interaction.channel.id !== "1276965741035388948") {
             return interaction.reply({ content: "**Puoi convocare utenti solo in <#1276965741035388948>**", ephemeral: true})
         }
@@ -1014,6 +1025,9 @@ client.on("interactionCreate", async interaction => {
                 player.play(resource);
                 connection.subscribe(player)
             }
+        }} catch(err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile convocare questo membro"})
         }
     }
     
@@ -1041,6 +1055,7 @@ client.on("interactionCreate", async interaction => {
     }
 
     if(interaction.commandName == "kick") {
+        try {
         let member = interaction.options.getMember("membro")
         let reason = interaction.options.getString("motivo") || "Nessun motivo"
 
@@ -1057,6 +1072,10 @@ client.on("interactionCreate", async interaction => {
         } catch(error) {
             console.error(`Errore durante l'espulsione: ${error}`)
         }
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile espellere questo membro"})
+        }
 
 
 
@@ -1069,6 +1088,7 @@ client.on("interactionCreate", async interaction => {
     }
 
     if(interaction.commandName == "ban") {
+        try {
         let member = interaction.options.getMember("membro")
         let reasonban = interaction.options.getString("motivo") || "Nessun motivo"
 
@@ -1086,6 +1106,10 @@ client.on("interactionCreate", async interaction => {
         } catch (error) {
             console.error(`Errore durante il ban: ${error}`)
             interaction.reply({ content: "Si è verificato un errore durante il ban del membro.", ephemeral: true });
+        }
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile bannare questo membro"})
         }
 
 
@@ -1328,6 +1352,7 @@ client.on("interactionCreate", async interaction => {
     }
 
     if(interaction.commandName == "timeout") {
+        try {
         const member = interaction.options.getMember("utente")
         const duration = interaction.options.getInteger("durata")
         const reason = interaction.options.getString("motivo") || "Nessun motivo"
@@ -1345,9 +1370,14 @@ client.on("interactionCreate", async interaction => {
         ifbotcommand.set("moderatorid", interaction.user.id)
 
         return interaction.reply({ content: `Hai messo in timeout con successo <@${member.user.id}> per ${duration} minuti.`, ephemeral: true });
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile impostare il timeout a questo membro"})
+        }
     }
     
     if(interaction.commandName == "untimeout") {
+        try {
         const member = interaction.options.getMember("utente")
 
         if (!interaction.member.roles.cache.has("1276959088047034490")) { return interaction.reply({ content: "Non sei uno staff", ephemeral: true})}
@@ -1359,6 +1389,10 @@ client.on("interactionCreate", async interaction => {
         await member.timeout(null)
 
         return interaction.reply({ content: `Hai tolto dal timeout con successo <@${member.user.id}>`, ephemeral: true });
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content: "Impossibile togliere il timeout a questo membro"})
+        }
     }
 
 
@@ -1749,6 +1783,7 @@ client.on("interactionCreate", interaction => {
 
         if (topic.startsWith("User ID:")) {
             if (interaction.member.roles.cache.has("1289639280473280624")) {
+                try {
                 var utente = interaction.options.getMember("membro")
                 if (!utente) {
                     interaction.reply({ content: "Inserire un utente valido", ephemeral: true})
@@ -1786,10 +1821,14 @@ client.on("interactionCreate", interaction => {
                 ])
 
                 interaction.reply({ content:`${utente.toString()} è stato aggiunto al ticket`})
-            } else {
+            } catch(err) {
+                console.error(err)
+                return interaction.reply({ content: "Impossibile aggiungere al ticket questo membro"})
+            }} else {
                 interaction.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
                 return
-            }
+            } 
+
         }
     }
 })
@@ -1806,6 +1845,7 @@ client.on("interactionCreate", interaction => {
 
         if (topic.startsWith("User ID:")) {
             if (interaction.member.roles.cache.has("1289639280473280624")) {
+                try {
                 var utente = interaction.options.getMember("membro")
                 if (!utente) {
                     interaction.reply({ content: "Inserire un utente valido", ephemeral: true})
@@ -1843,7 +1883,10 @@ client.on("interactionCreate", interaction => {
                 ])
 
                 interaction.reply({ content:`${utente.toString()} è stato rimosso dal ticket`})
-            } else {
+            } catch (err) {
+                console.error(err)
+                return interaction.reply({ content: "Impossibile rimuovere questo membro dal ticket"})
+            }} else {
                 interaction.reply({ content: "Questo comando è riservato agli staff", ephemeral: true});
                 return
             }
@@ -1851,49 +1894,6 @@ client.on("interactionCreate", interaction => {
     }
 })
 
-app.use(bodyParser.json());
-
-// Endpoint per inviare l'embed
-app.post('/send-to-discord', async (req, res) => {
-    const { name, email, message } = req.body;
-
-    if (!name || !email || !message) {
-        return res.status(400).json({ message: 'Tutti i campi sono obbligatori!' });
-    }
-
-    try {
-        // Ottieni il canale Discord
-        const channel = discordClient.channels.cache.get(process.env.DISCORD_CHANNEL_ID);
-        if (!channel) {
-            return res.status(500).json({ message: 'Canale Discord non trovato!' });
-        }
-
-        // Crea e invia l'embed
-        const embed = {
-            color: 0x1e90ff,
-            title: 'Nuovo messaggio ricevuto!',
-            fields: [
-                { name: 'Nome:', value: name, inline: true },
-                { name: 'Email:', value: email, inline: true },
-                { name: 'Messaggio:', value: message, inline: false },
-            ],
-            timestamp: new Date(),
-        };
-
-        await channel.send({ embeds: [embed] });
-
-        // Risposta al client
-        res.status(200).json({ message: 'Messaggio inviato a Discord!' });
-    } catch (error) {
-        console.error('Errore durante l\'invio del messaggio a Discord:', error);
-        res.status(500).json({ message: 'Errore durante l\'invio a Discord.' });
-    }
-});
-
-// Avvio del server
-app.listen(PORT, () => {
-    console.log(`Server in esecuzione su http://localhost:${PORT}`);
-});
 
 
 
