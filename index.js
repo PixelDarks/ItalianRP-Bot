@@ -58,11 +58,11 @@ let bypassbotcommand = false
         
 //ELIMINA COMANDI
         
-/*const rest = new REST().setToken(process.env.TOKEN)
+const rest = new REST().setToken(process.env.TOKEN)
 
 //                                            || Bot ID                || Guild ID           || Command ID
         
-rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1314617185997422633"))
+/*rest.delete(Routes.applicationGuildCommand("1307253398466465802", "1276898638509113476", "1317219599321927841"))
     .then(() => console.log("Comando eliminato"))
     .catch(console.error)*/
     
@@ -274,19 +274,6 @@ client.on("ready", () => {
                     name: "utente",
                     description: "L'utente da rimuovere dal timeout",
                     type: Discord.ApplicationCommandOptionType.User,
-                    required: true
-                }
-            ]
-        })
-        
-        guild.commands.create({
-            name: "play",
-            description: "Riproduce una canzone in un canale vocale",
-            options: [
-                {
-                    name: "canzone",
-                    description: "Nome della canzone",
-                    type: Discord.ApplicationCommandOptionType.String,
                     required: true
                 }
             ]
