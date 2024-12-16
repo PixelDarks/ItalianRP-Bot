@@ -296,6 +296,11 @@ client.on("ready", () => {
                 }
             ]
         })
+
+        guild.commands.create({
+            name: "github",
+            description: "Mostra la mia repository"
+        })
 })})
 
 setInterval(function () {
@@ -1395,31 +1400,8 @@ client.on("interactionCreate", async interaction => {
         }
     }
 
-
-    //MUSIC
-
-    if (interaction.commandName == "play") {
-
-        const song = interaction.options.getString("canzone")
-
-        return interaction.reply({ content: "Comando in fase di sviluppo", ephemeral: true})
-
-        const voiceChannel = interaction.member.voice.channel
-        if (!voiceChannel) {
-            return interaction.reply({ content: "Devi essere in un canale vocale", ephemeral: true})
-        }
-
-        const voiceChannelBot = client.guilds.cache.get("1276898638509113476").members.cache.get(client.user.id).voice.channel
-
-        if (voiceChannelBot) {
-            return interaction.reply({ content: "Il bot è già in un altro canale vocale", ephemeral: true})
-        }
-
-        distube.play(voiceChannelBot || voiceChannel, song, {
-            member: interaction.member,
-            textChannel: interaction.channel,
-            message: interaction
-        })
+    if(interaction.commandName == "github") {
+        interaction.reply({ content: "https://github.com/PixelDarks/ItalianRP-Bot", ephemeral: true})
     }
 
 })
