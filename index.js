@@ -5,11 +5,6 @@ const pathToFFmpeg = "D:/Percorso/Della/Cartella/FFmpeg/bin/ffmpeg.exe";
 const { REST, Routes } = require("discord.js")
 
 
-const { DisTube } = require("distube")
-
-const { YtDlpPlugin } = require("@distube/yt-dlp")
-
-
 process.env.FFMPEG_PATH = pathToFFmpeg
 
 const client = new Discord.Client(
@@ -449,22 +444,6 @@ client.on("guildMemberAdd", async member => {
     
     member.roles.add(roleid)
     console.log("Ruolo Cittadino di Italian RP aggiunto a " + member.user.username)
-})
-
-
-
-const distube = new DisTube(client, {
-    plugins: [ new YtDlpPlugin()],
-    emitAddListWhenCreatingQueue: true,
-    emitAddSongWhenCreatingQueue: false,
-    emitNewSongOnly: true,
-    nsfw: true,
-    joinNewVoiceChannel: false,
-    ffmpeg: {
-        args: ["-analyzeduration", "0", "-loglevel", "0"],
-        path: "C:/FFmpeg"
-    }
-
 })
 
 /*client.on("messageCreate", message => {
