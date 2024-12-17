@@ -283,6 +283,16 @@ client.on("ready", () => {
             name: "github",
             description: "Mostra la mia repository"
         })
+
+        guild.commands.create({
+            name: "assistenzaon",
+            description: "Attiva il servizio dell'assistenza"
+        })
+
+        guild.commands.create({
+            name: "assistenzaoff",
+            description: "Disattiva il servizio dell'assistenza"
+        })
 })})
 
 setInterval(function () {
@@ -1370,6 +1380,31 @@ client.on("interactionCreate", async interaction => {
         interaction.reply({ content: "https://github.com/PixelDarks/ItalianRP-Bot", ephemeral: true})
     }
 
+    if(interaction.commandName == "assistenzaon") {
+        let chatass = "1283352443417264128"
+        let allowedrole = "1276959088047034490"
+
+        if (!interaction.member.roles.cache.has(allowedrole)) {return interaction.reply("Non sei uno staff")}
+
+        if (interaction.channel.id !== chatass) return interaction.reply("Non puoi usare questo comando qui")
+
+        let embed = new Discord.EmbedBuilder()
+            .setTitle("**ASSISTENZE APERTE**")
+            .setColor("Green")
+            .setDescription(`Entrate in <#1276968449574174720> se volete avere qualche informazione, oppure per chiedere informazioni o spoilers riguardante il server`)
+
+        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>"})
+    }
+
+    if(interaction.commandName == "assistenzaoff") {
+        let embed = new Discord.EmbedBuilder()
+            .setTitle("**ASSISTENZE CHIUSE**")
+            .setColor("Red")
+            .setDescription(`Tornate la prossima volta per chiedere qualche informazione`)
+            
+        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>"})
+    }
+
 })
 
 
@@ -1377,8 +1412,6 @@ client.on("interactionCreate", async interaction => {
     if (interaction.isModalSubmit()) {
         if(interaction.customId === "modalTicket") {
 
-            
-            
             const userInput = interaction.fields.getTextInputValue("problem_input")
             
             var user = interaction.user;
