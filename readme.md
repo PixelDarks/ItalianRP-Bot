@@ -13,8 +13,8 @@ Tasks for this:
 - [x] _Give the server link and server info_
 - [x] _Set timeout to players_
 - [x] _Set nicknames to other players_
-- [x] _Mute other pla-yers_
-- [ ] \_Vocal Commands
+- [x] _Mute other players_
+- [ ] _Vocal Commands_
 
 ### **And So Much More...**
 
