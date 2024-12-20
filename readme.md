@@ -14,6 +14,7 @@ This bot can:
 - [x] _Set timeout to players_
 - [x] _Set nicknames to other players_
 - [x] _Mute other players_
+- [ ] Vocal Commands
 
 ### **And So Much More...**
 
