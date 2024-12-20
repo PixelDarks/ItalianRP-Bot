@@ -17,4 +17,4 @@ This bot can:
 
 ### **And So Much More...**
 
-### ⚠️ This bot can only be used in the official server
+### :warning: This bot can only be used in the official server
