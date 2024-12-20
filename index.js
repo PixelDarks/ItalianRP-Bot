@@ -1156,6 +1156,7 @@ client.on("interactionCreate", async interaction => {
 
     }
 
+    
     if(interaction.commandName == "serverlink") {
         let embed = new Discord.EmbedBuilder()
             .setTitle("Link del Server Roblox")
