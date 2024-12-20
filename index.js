@@ -293,6 +293,54 @@ client.on("ready", () => {
             name: "assistenzaoff",
             description: "Disattiva il servizio dell'assistenza"
         })
+
+        guild.commands.create({
+            name: "nickname",
+            description: "Imposta un nickname ad un utente",
+            options: [
+                {
+                    name: "utente",
+                    description: "Definisci l'utente",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                },
+                {
+                    name: "nick",
+                    description: "Scrivi il nick da assegnare all'utente",
+                    type: Discord.ApplicationCommandOptionType.String,
+                    required: false
+                }
+                
+            ]
+        })
+
+        guild.commands.create({
+            name: "mute",
+            description: "Muta un utente",
+            options: [
+                {
+                    name: "utente",
+                    description: "Utente da mutare",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+
+        guild.commands.create({
+            name: "unmute",
+            description: "Smuta un utente",
+            options: [
+                {
+                    name: "utente",
+                    description: "Utente da smutare",
+                    type: Discord.ApplicationCommandOptionType.User,
+                    required: true
+                }
+            ]
+        })
+
+        client.user.setActivity('ITALIAN RP 2025 🔥', { type: Discord.ActivityType.Watching });
 })})
 
 setInterval(function () {
@@ -857,7 +905,6 @@ client.on("interactionCreate", async interaction => {
             
             member.roles.add(role)
 
-
             const temprolesData = JSON.parse(fs.readFileSync(path, 'utf8') || '{"userRoles": []}');
             temprolesData.userRoles.push({
                 userId: member.id,
@@ -892,7 +939,13 @@ client.on("interactionCreate", async interaction => {
                 .setFooter({ text: member.user.username, iconURL: member.user.displayAvatarURL({ extension: 'png'})})
                 .setColor("Red")
 
-            client.channels.cache.get("1277145413731880990").send({ embeds: [embed2]})
+
+            if (!member.roles.cache.has("1276959088047034490")) {
+                client.channels.cache.get("1277145413731880990").send({ embeds: [embed2]})
+                
+            } else {
+                client.channels.cache.get("1286783677291958352").send({ embeds: [embed2]})
+            }
             } catch (err) {
                 console.error(err)
                 return interaction.reply({ content: "Impossibile assegnare il warn a questo membro"})
@@ -1384,25 +1437,102 @@ client.on("interactionCreate", async interaction => {
         let chatass = "1283352443417264128"
         let allowedrole = "1276959088047034490"
 
-        if (!interaction.member.roles.cache.has(allowedrole)) {return interaction.reply("Non sei uno staff")}
+        if (!interaction.member.roles.cache.has(allowedrole)) {return interaction.reply({ content:"Non sei uno staff", ephemeral: true})}
 
-        if (interaction.channel.id !== chatass) return interaction.reply("Non puoi usare questo comando qui")
+        if (interaction.channel.id !== chatass) return interaction.reply({ content:"Non puoi usare questo comando qui", ephemeral: true})
 
         let embed = new Discord.EmbedBuilder()
             .setTitle("**ASSISTENZE APERTE**")
             .setColor("Green")
             .setDescription(`Entrate in <#1276968449574174720> se volete avere qualche informazione, oppure per chiedere informazioni o spoilers riguardante il server`)
 
-        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>"})
+        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>", allowedMentions: {roles: ["1276923411498795100"]}})
     }
 
     if(interaction.commandName == "assistenzaoff") {
+        let chatass = "1283352443417264128"
+        let allowedrole = "1276959088047034490"
+
+        if (!interaction.member.roles.cache.has(allowedrole)) {return interaction.reply({ content:"Non sei uno staff", ephemeral: true})}
+
+        if (interaction.channel.id !== chatass) return interaction.reply({ content:"Non puoi usare questo comando qui", ephemeral: true})
+
         let embed = new Discord.EmbedBuilder()
             .setTitle("**ASSISTENZE CHIUSE**")
             .setColor("Red")
             .setDescription(`Tornate la prossima volta per chiedere qualche informazione`)
             
-        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>"})
+        interaction.reply({ embeds: [embed], content: "<@&1276923411498795100>", allowedMentions: {roles: ["1276923411498795100"]}})
+    }
+
+    if(interaction.commandName == "nickname") {
+        try {
+        const user = interaction.options.getMember("utente")
+        const nick = interaction.options.getString("nick") || ""
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) return interaction.reply({ content: "Non sei uno staff", ephemeral: true})
+
+        if (!user.moderatable) {
+            return interaction.reply({ content: "Impossibile impostare un nickname a questo utente", ephemeral: true})
+        }
+
+        if (nick.length > 32) {
+            return interaction.reply({ content: "Il nick deve essere di 32 caratteri o meno", ephemeral: true})
+        }
+
+        user.setNickname(nick)
+
+        interaction.reply({ content: `<@${user.user.id}> è stato aggiornato con successo`, ephemeral: true})
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content:"Impossibile eseguire il comando"})
+        }
+    }
+
+    if(interaction.commandName == "mute") {
+        try {
+        const user = interaction.options.getMember("utente")
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {
+            return interaction.reply({ content: 'Non sei uno staff', ephemeral: true});
+        }
+
+        if(user.roles.cache.has("1318999628519309352")) return interaction.reply({ content: "Questo utente è già mutato", ephemeral: true})
+        
+        
+        user.roles.add("1318999628519309352")
+
+        ifbotcommand.set("moderatorid", interaction.user.id)
+        
+        interaction.reply({ content: 'Utente mutato con successo', ephemeral: true})} catch (err) {
+            console.error(err)
+            return interaction.reply({ content:"Impossibile eseguire il comando"})
+        }
+            
+        
+    }
+
+    if(interaction.commandName == "unmute") {
+        try {
+        const user = interaction.options.getMember("utente")
+
+        if (!interaction.member.roles.cache.has("1276959088047034490")) {
+            return interaction.reply({ content: 'Non sei uno staff', ephemeral: true});
+        }
+        
+        if(!user.roles.cache.has("1318999628519309352")) return interaction.reply({ content: "Questo utente non è ancora stato mutato", ephemeral: true})
+        
+        user.roles.remove("1318999628519309352")
+
+        ifbotcommand.set("moderatorid", interaction.user.id)
+        
+        interaction.reply({ content: 'Utente smutato con successo', ephemeral: true})
+        } catch (err) {
+            console.error(err)
+            return interaction.reply({ content:"Impossibile eseguire il comando"})
+        } 
+            
+        
     }
 
 })
