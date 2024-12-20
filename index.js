@@ -24,6 +24,8 @@ const client = new Discord.Client({
   ],
 });
 
+const badwordsmap = new Map();
+
 console.log("Il bot è stato correttamente avviato.");
 
 client.commands = new Discord.Collection();
@@ -972,6 +974,7 @@ client.on("interactionCreate", async (interaction) => {
       );
       temprolesData.userRoles.push({
         userId: member.id,
+        username: member.user.username,
         roleId: role.id,
         guildId: interaction.guild.id,
         expiresAt: Date.now() + duration * 86400000,
@@ -2364,5 +2367,98 @@ client.on("interactionCreate", (interaction) => {
         return;
       }
     }
+  }
+});
+
+//SYSTEM MODERATION
+function containsInappropriateWords(badwords, content) {
+  return badwords.some((word) => {
+    const regex = new RegExp(`\\b${word}\\b`, "i");
+    return regex.test(content);
+  });
+}
+
+function getWarnToAssign(member, warn1, warn2, warn3) {
+  if (
+    member.roles.cache.has(warn1) &&
+    member.roles.cache.has(warn2) &&
+    member.roles.cache.has(warn3)
+  ) {
+    return;
+  } else if (member.roles.cache.has(warn1) && member.roles.cache.has(warn2)) {
+    return "1286790267847966791";
+  } else if (member.roles.cache.has(warn1)) {
+    return "1284944949091242055";
+  } else {
+    return "1284943553209958551";
+  }
+}
+
+client.on("messageCreate", async (message) => {
+  const badwords = require("./badwords.json");
+
+  if (containsInappropriateWords(badwords, message.content.toLowerCase())) {
+    try {
+      badwordsmap.set(
+        message.author.id,
+        (badwordsmap.get(message.author.id) || 0) + 1
+      );
+    } catch (err) {
+      console.error("Errore nella memorizzazione del conteggio: ", err);
+    }
+
+    if (badwordsmap.get(message.author.id) >= 3) {
+      const member = client.guilds.cache
+        .get("1276898638509113476")
+        .members.cache.get(message.author.id);
+
+      const role = getWarnToAssign(
+        member,
+        "1284943553209958551",
+        "1284944949091242055",
+        "1286790267847966791"
+      );
+
+      if (!member.roles.cache.has("1286790267847966791")) {
+        member.roles.add(role);
+      } else {
+        return message.reply({
+          content: "Hai già il terzo warn, lo staff potrebbe prenderne atto",
+        });
+      }
+
+      let embed = new Discord.EmbedBuilder()
+        .setAuthor({
+          name: client.user.username,
+          iconURL: client.user.displayAvatarURL({ extension: "png" }),
+        })
+        .setDescription(`L'autore assegna <@&${role}> a <@${member.id}>`)
+        .addFields({
+          name: "Motivo:",
+          value: "Ha scritto 3 o più parolacce in un canale testuale",
+          inline: true,
+        })
+        .setFooter({
+          text: member.user.username,
+          iconURL: member.user.displayAvatarURL({ extension: "png" }),
+        })
+        .setColor("Red");
+
+      try {
+        client.channels.cache
+          .get("1277145413731880990")
+          .send({ embeds: [embed] });
+      } catch (err) {
+        console.error("Errore nell' invio del warn: ", err);
+      }
+
+      badwordsmap.delete(message.author.id);
+    }
+
+    await message.react("⚠️");
+    message.reply({
+      content:
+        "Hai scritto una parola o frase inappropriata. Potrebbe comportare un warn se continui",
+    });
   }
 });
