@@ -24,6 +24,8 @@ const client = new Discord.Client({
   ],
 });
 
+const googleTTS = require("google-tts-api");
+
 const badwordsmap = new Map();
 
 console.log("Il bot è stato correttamente avviato.");
@@ -340,6 +342,19 @@ client.on("ready", () => {
       ],
     });
 
+    guild.commands.create({
+      name: "parla",
+      description: "Il bot parla in un canale vocale",
+      options: [
+        {
+          name: "contenuto",
+          description: "Scrivi il contenuto che dopo sarà pronunciato da me",
+          type: Discord.ApplicationCommandOptionType.String,
+          required: true,
+        },
+      ],
+    });
+
     client.user.setActivity("ITALIAN RP 2025 🔥", {
       type: Discord.ActivityType.Watching,
     });
@@ -407,33 +422,12 @@ setInterval(function () {
     })
 }, 1000 * 30)*/
 
-setInterval(function () {
-  let memberchannel = client.channels.cache.get("1297245091110457444");
-
-  try {
-    let membercount = client.guilds.cache.get(
-      "1276898638509113476"
-    ).memberCount;
-
-    memberchannel.setName(`🙋| Membri: ${membercount}`);
-
-    let staffchannel = client.channels.cache.get("1276904045960892530");
-
-    let staffcount = client.guilds.cache
-      .get("1276898638509113476")
-      .roles.cache.get("1276959088047034490").members.size;
-
-    staffchannel.setName(`🕵| Staff: ${staffcount}`);
-  } catch (err) {
-    console.error("Problemi nelle assegnazione dei membri o staff: ", err);
-  }
-}, 5000);
-
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const {
   joinVoiceChannel,
   createAudioPlayer,
   createAudioResource,
+  AudioPlayerStatus,
 } = require("@discordjs/voice");
 const { default: ffmpegPath } = require("ffmpeg-static");
 const { channel } = require("diagnostics_channel");
@@ -513,34 +507,34 @@ client.on("guildMemberAdd", async (member) => {
 });
 
 /*client.on("messageCreate", message => {
-    if (message.content == "!ticketsassistenzanuovo1") {
-        let embedhelp = new Discord.EmbedBuilder()
-        .setTitle("Assistenza")
-        .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
-        .setThumbnail(icon)
-        .setColor("Green")
-        .setFooter({
-            text: "Assistenza - IRP",
-            iconURL: icon
-            })
-            let buttonshelp = new Discord.ButtonBuilder()
-            .setCustomId("buttoncreate")
-            .setLabel("Apri un ticket")
-            .setStyle("Success")
-            .setEmoji('📩')
-
-        //let buttonshelpvip = new Discord.MessageButton()
-            //.setCustomId("buttonvip")
-            //.setLabel("Assistenza Prioritaria")
-           // .setStyle("PRIMARY")
-            //.setEmoji('💎')
-
-        let rowhelp = new Discord.ActionRowBuilder()
-            .addComponents(buttonshelp)
-
-        message.channel.send({ embeds: [embedhelp], components: [rowhelp]})
-    }
-})*/
+  if (message.content == "!ticketsassistenzanuovo1") {
+    let embedhelp = new Discord.EmbedBuilder()
+    .setTitle("Assistenza")
+    .setDescription("Clicca il pulsante sottostante se hai bisogno di assistenza via ticket.\nAprire un ticket e non fornire nessuna risposta in esso\nper un tempo maggiore di 24h comporterà la chiusura automatica\ndello stesso")
+    .setThumbnail(icon)
+    .setColor("Green")
+    .setFooter({
+      text: "Assistenza - IRP",
+      iconURL: icon
+      })
+      let buttonshelp = new Discord.ButtonBuilder()
+      .setCustomId("buttoncreate")
+      .setLabel("Apri un ticket")
+      .setStyle("Success")
+      .setEmoji('📩')
+      
+      //let buttonshelpvip = new Discord.MessageButton()
+      //.setCustomId("buttonvip")
+      //.setLabel("Assistenza Prioritaria")
+      // .setStyle("PRIMARY")
+      //.setEmoji('💎')
+      
+      let rowhelp = new Discord.ActionRowBuilder()
+      .addComponents(buttonshelp)
+      
+      message.channel.send({ embeds: [embedhelp], components: [rowhelp]})
+      }
+      })*/
 
 setInterval(() => {
   const temprolesData = JSON.parse(
@@ -573,6 +567,28 @@ setInterval(() => {
     "utf8"
   );
 }, 60000);
+
+setInterval(function () {
+  let memberchannel = client.channels.cache.get("1297245091110457444");
+
+  try {
+    let membercount = client.guilds.cache.get(
+      "1276898638509113476"
+    ).memberCount;
+
+    memberchannel.setName(`🙋| Membri: ${membercount}`);
+
+    let staffchannel = client.channels.cache.get("1276904045960892530");
+
+    let staffcount = client.guilds.cache
+      .get("1276898638509113476")
+      .roles.cache.get("1276959088047034490").members.size;
+
+    staffchannel.setName(`🕵| Staff: ${staffcount}`);
+  } catch (err) {
+    console.error("Problemi nelle assegnazione dei membri o staff: ", err);
+  }
+}, 15000);
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isButton()) return;
@@ -1813,6 +1829,58 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: "Impossibile eseguire il comando" });
     }
   }
+
+  if (interaction.commandName == "parla") {
+    try {
+      const text = interaction.options.getString("contenuto");
+      const channel = interaction.member.voice.channel;
+
+      if (!channel)
+        return interaction.reply({
+          content:
+            "Devi essere in un canale vocale per utilizzare questo comando",
+          ephemeral: true,
+        });
+
+      await interaction.reply({
+        content: `Sto parlando: ${text}`,
+        ephemeral: true,
+      });
+
+      const url = googleTTS.getAudioUrl(text, {
+        lang: "it",
+        slow: false,
+        host: "https://translate.google.com",
+      });
+
+      // Connettiti al canale vocale
+      const connection = joinVoiceChannel({
+        channelId: channel.id,
+        guildId: channel.guild.id,
+        adapterCreator: channel.guild.voiceAdapterCreator,
+      });
+
+      const player = createAudioPlayer();
+      const resource = createAudioResource(url);
+
+      player.play(resource);
+      connection.subscribe(player);
+
+      player.on(AudioPlayerStatus.Idle, () => {
+        connection.destroy();
+      });
+
+      player.on("error", (error) => {
+        console.error("Errore durante la riproduzione audio:", error);
+        connection.destroy();
+      });
+    } catch (error) {
+      console.error(error);
+      interaction.reply({
+        content: "Impossibile eseguire il comando, riprova più tardi",
+      });
+    }
+  }
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -2397,6 +2465,9 @@ function getWarnToAssign(member, warn1, warn2, warn3) {
 client.on("messageCreate", async (message) => {
   const badwords = require("./badwords.json");
 
+  if (message.author.bot) return;
+  if (message.author.id === client.user.id) return;
+
   if (containsInappropriateWords(badwords, message.content.toLowerCase())) {
     try {
       badwordsmap.set(
@@ -2412,6 +2483,8 @@ client.on("messageCreate", async (message) => {
         .get("1276898638509113476")
         .members.cache.get(message.author.id);
 
+      const channel = client.channels.cache.get(message.channel.id).id;
+
       const role = getWarnToAssign(
         member,
         "1284943553209958551",
@@ -2420,6 +2493,7 @@ client.on("messageCreate", async (message) => {
       );
 
       if (!member.roles.cache.has("1286790267847966791")) {
+        bypassbotcommand = true;
         member.roles.add(role);
       } else {
         return message.reply({
@@ -2435,7 +2509,7 @@ client.on("messageCreate", async (message) => {
         .setDescription(`L'autore assegna <@&${role}> a <@${member.id}>`)
         .addFields({
           name: "Motivo:",
-          value: "Ha scritto 3 o più parolacce in un canale testuale",
+          value: `Ha scritto 3 o più parolacce in <#${channel}>`,
           inline: true,
         })
         .setFooter({
