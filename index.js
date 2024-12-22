@@ -1835,6 +1835,13 @@ client.on("interactionCreate", async (interaction) => {
       const text = interaction.options.getString("contenuto");
       const channel = interaction.member.voice.channel;
 
+      if (text.length > 200) {
+        return interaction.reply({
+          content: "Il testo è troppo lungo",
+          ephemeral: true,
+        });
+      }
+
       if (!channel)
         return interaction.reply({
           content:
