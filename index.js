@@ -395,32 +395,51 @@ setInterval(function () {
   }
 }, 10000);
 
-/*const ytch = require("yt-channel-info")
-setInterval(function () {
-    ytch.getChannelVideos("UCRY8qdjm2yL8j0RN2SA50PA", "newest").then(async response => {
-        var idVideo = response.items[0].videoId
-        if (!idVideo) return
+const ytch = require("yt-channel-info");
 
-        client.channels.cache.get("1276933005302173696").messages.fetch()
-            .then(messages => {
-                var sent = false
-                messages.forEach(msg => {
-                    if (msg.content.includes(idVideo)) sent = true
-                })
+setInterval(async function () {
+  try {
+    const response = await ytch.getChannelVideos(
+      "UCRY8qdjm2yL8j0RN2SA50PA",
+      "newest"
+    );
+    const idVideo = response.items[0].liveNow?.id;
+    if (!idVideo) return;
 
-                if (!sent) {
-                    const canale1 = client.channels.cache.get("1276933005302173696")
+    const channel = client.channels.cache.get("1276933005302173696");
+    const messages = await channel.messages.fetch();
 
-                    let embed = new Discord.EmbedBuilder()
-                        .setTitle("-- ❗NUOVA LIVE❗ --")
-                        .setDescription(`È appena uscita una nuova live sul canale di SamuGamer \n\n https://www.youtube/watch?v=${idVideo}`)
-                        .setThumbnail(client.guilds.cache.get("1276898638509113476").members.cache.get("989918527257452564").user.displayAvatarURL({extension: 'png'}))
+    let sent = false;
+    messages.forEach((msg) => {
+      if (msg.content.includes(idVideo)) sent = true;
+    });
 
-                    canale1.send({embeds: [embed]})
-                }
-            })
-    })
-}, 1000 * 30)*/
+    if (!sent) {
+      const thumbnailUrl = `https://img.youtube.com/vi/${idVideo}/maxresdefault.jpg`;
+
+      const embed = new Discord.EmbedBuilder()
+        .setTitle("-- ❗NUOVA LIVE❗ --")
+        .setDescription(
+          `È appena uscita una nuova live sul canale di SamuGamer \n\n https://www.youtube.com/watch?v=${idVideo}`
+        )
+        .setImage(thumbnailUrl)
+        .setColor("Red")
+        .setThumbnail(
+          client.guilds.cache
+            .get("1276898638509113476")
+            .members.cache.get("989918527257452564")
+            .user.displayAvatarURL({ extension: "png" })
+        );
+
+      channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error(
+      "Errore durante il controllo dei video del canale YouTube:",
+      error
+    );
+  }
+}, 1000 * 30);
 
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const {
@@ -1885,6 +1904,7 @@ client.on("interactionCreate", async (interaction) => {
       console.error(error);
       interaction.reply({
         content: "Impossibile eseguire il comando, riprova più tardi",
+        ephemeral: true,
       });
     }
   }
