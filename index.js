@@ -24,8 +24,6 @@ const client = new Discord.Client({
   ],
 });
 
-const googleTTS = require("google-tts-api");
-
 const badwordsmap = new Map();
 
 console.log("Il bot è stato correttamente avviato.");
@@ -337,19 +335,6 @@ client.on("ready", () => {
           name: "utente",
           description: "Utente da smutare",
           type: Discord.ApplicationCommandOptionType.User,
-          required: true,
-        },
-      ],
-    });
-
-    guild.commands.create({
-      name: "parla",
-      description: "Il bot parla in un canale vocale",
-      options: [
-        {
-          name: "contenuto",
-          description: "Scrivi il contenuto che dopo sarà pronunciato da me",
-          type: Discord.ApplicationCommandOptionType.String,
           required: true,
         },
       ],
@@ -1848,66 +1833,6 @@ client.on("interactionCreate", async (interaction) => {
       return interaction.reply({ content: "Impossibile eseguire il comando" });
     }
   }
-
-  if (interaction.commandName == "parla") {
-    try {
-      const text = interaction.options.getString("contenuto");
-      const channel = interaction.member.voice.channel;
-
-      if (text.length > 200) {
-        return interaction.reply({
-          content: "Il testo è troppo lungo",
-          ephemeral: true,
-        });
-      }
-
-      if (!channel)
-        return interaction.reply({
-          content:
-            "Devi essere in un canale vocale per utilizzare questo comando",
-          ephemeral: true,
-        });
-
-      await interaction.reply({
-        content: `Sto parlando: ${text}`,
-        ephemeral: true,
-      });
-
-      const url = googleTTS.getAudioUrl(text, {
-        lang: "it",
-        slow: false,
-        host: "https://translate.google.com",
-      });
-
-      // Connettiti al canale vocale
-      const connection = joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator,
-      });
-
-      const player = createAudioPlayer();
-      const resource = createAudioResource(url);
-
-      player.play(resource);
-      connection.subscribe(player);
-
-      player.on(AudioPlayerStatus.Idle, () => {
-        connection.destroy();
-      });
-
-      player.on("error", (error) => {
-        console.error("Errore durante la riproduzione audio:", error);
-        connection.destroy();
-      });
-    } catch (error) {
-      console.error(error);
-      interaction.reply({
-        content: "Impossibile eseguire il comando, riprova più tardi",
-        ephemeral: true,
-      });
-    }
-  }
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -2489,6 +2414,22 @@ function getWarnToAssign(member, warn1, warn2, warn3) {
   }
 }
 
+function getDuration(member, warn1, warn2, warn3) {
+  if (
+    member.roles.cache.has(warn1) &&
+    member.roles.cache.has(warn2) &&
+    member.roles.cache.has(warn3)
+  ) {
+    return;
+  } else if (member.roles.cache.has(warn1) && member.roles.cache.has(warn2)) {
+    return 14;
+  } else if (member.roles.cache.has(warn1)) {
+    return 14;
+  } else {
+    return 7;
+  }
+}
+
 client.on("messageCreate", async (message) => {
   const badwords = require("./badwords.json");
 
@@ -2519,9 +2460,28 @@ client.on("messageCreate", async (message) => {
         "1286790267847966791"
       );
 
+      const duration = getDuration(
+        member,
+        "1284943553209958551",
+        "1284944949091242055",
+        "1286790267847966791"
+      );
+
       if (!member.roles.cache.has("1286790267847966791")) {
         bypassbotcommand = true;
         member.roles.add(role);
+
+        const temprolesData = JSON.parse(
+          fs.readFileSync(path, "utf8") || '{"userRoles": []}'
+        );
+        temprolesData.userRoles.push({
+          userId: member.id,
+          username: member.user.username,
+          roleId: role.id,
+          guildId: message.guild.id,
+          expiresAt: Date.now() + duration * 86400000,
+        });
+        fs.writeFileSync(path, JSON.stringify(temprolesData, null, 2), "utf8");
       } else {
         return message.reply({
           content: "Hai già il terzo warn, lo staff potrebbe prenderne atto",
