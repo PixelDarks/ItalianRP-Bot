@@ -2436,7 +2436,12 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
   if (message.author.id === client.user.id) return;
 
-  if (containsInappropriateWords(badwords, message.content.toLowerCase())) {
+  const normalMessage = message.content
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "");
+
+  if (containsInappropriateWords(badwords, normalMessage)) {
     try {
       badwordsmap.set(
         message.author.id,
